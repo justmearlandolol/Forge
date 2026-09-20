@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#FFFFFF"/>
+  <rect x="4" y="4" width="56" height="56" fill="#0A0A0A"/>
+  <text x="32" y="30" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-size="14" font-weight="900" fill="#FF3B30">NO</text>
+  <text x="32" y="48" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-size="12" font-weight="900" fill="#FFFFFF">ESCAPE</text>
+  <rect x="10" y="10" width="8" height="8" fill="#FFD60A"/>
+  <rect x="46" y="46" width="8" height="8" fill="#FF3B30"/>
+</svg>

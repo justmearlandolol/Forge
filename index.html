@@ -1,0 +1,3869 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <title>FORGE — Forced Strength</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0A0A'/%3E%3Crect x='4' y='4' width='56' height='56' rx='12' fill='%23FF3B30'/%3E%3Cpath d='M18 40 L28 18 L38 40 Z' fill='%23fff'/%3E%3Crect x='30' y='24' width='16' height='7' rx='2' fill='%23fff'/%3E%3Ccircle cx='48' cy='27.5' r='5' fill='%23FFD60A'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --bg-elev: #141414;
+        --bg-card: rgba(28, 28, 30, 0.72);
+        --line: rgba(255, 255, 255, 0.08);
+        --line-hard: #fff;
+        --text: #f5f5f7;
+        --muted: #a1a1a6;
+        --red: #ff3b30;
+        --orange: #ff9f0a;
+        --yellow: #ffd60a;
+        --green: #30d158;
+        --blue: #0a84ff;
+        --radius: 18px;
+        --radius-sm: 12px;
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        --font:
+          "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+          "Segoe UI", sans-serif;
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+
+      #app {
+        min-height: 100%;
+        position: relative;
+      }
+
+      .view {
+        display: none;
+        min-height: 100dvh;
+        position: relative;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .noise {
+        pointer-events: none;
+        position: fixed;
+        inset: 0;
+        opacity: 0.045;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      .glass {
+        background: var(--bg-card);
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 52px;
+        padding: 0 22px;
+        border-radius: 980px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+        transition:
+          transform 0.2s var(--ease),
+          background 0.2s var(--ease),
+          opacity 0.2s;
+        user-select: none;
+      }
+
+      .btn:active {
+        transform: scale(0.97);
+      }
+
+      .btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-primary {
+        background: #fff;
+        color: #000;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #f2f2f2;
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .btn-ghost:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .btn-block {
+        width: 100%;
+      }
+
+      .btn-brutal {
+        background: var(--red);
+        color: #fff;
+        border-radius: 8px;
+        border: 3px solid #fff;
+        box-shadow: 6px 6px 0 #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 800;
+        min-height: 56px;
+        padding: 0 28px;
+      }
+
+      .btn-brutal:hover:not(:disabled) {
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0 #fff;
+      }
+
+      .btn-brutal:active:not(:disabled) {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 #fff;
+      }
+
+      .btn-google {
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .login-grid {
+        position: relative;
+        z-index: 1;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        gap: 32px;
+        padding: 40px 20px;
+        grid-template-columns: 1fr;
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+
+      @media (min-width: 900px) {
+        .login-grid {
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 48px;
+        }
+      }
+
+      .brand-block {
+        text-align: center;
+      }
+
+      @media (min-width: 900px) {
+        .brand-block {
+          text-align: left;
+        }
+      }
+
+      .brand-mark {
+        display: inline-flex;
+        margin-bottom: 18px;
+        filter: drop-shadow(0 12px 30px rgba(255, 59, 48, 0.45));
+      }
+
+      .brand-title {
+        font-size: clamp(56px, 12vw, 96px);
+        font-weight: 900;
+        letter-spacing: -0.06em;
+        line-height: 0.9;
+      }
+
+      .brand-tag {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .brutal-stamp {
+        display: inline-block;
+        margin-top: 22px;
+        padding: 10px 14px;
+        border: 3px solid var(--yellow);
+        color: var(--yellow);
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        transform: rotate(-2deg);
+        background: rgba(255, 214, 10, 0.06);
+      }
+
+      .login-card {
+        width: min(420px, 100%);
+        border-radius: 28px;
+        padding: 28px;
+      }
+
+      .login-card h2 {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        margin-bottom: 10px;
+      }
+
+      .muted {
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .fine-print {
+        margin-top: 18px;
+        font-size: 12px;
+        color: #6e6e73;
+        line-height: 1.45;
+        text-align: center;
+      }
+
+      .onboard-wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 28px 20px 60px;
+      }
+
+      .progress-rail {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 99px;
+        overflow: hidden;
+        margin-bottom: 28px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 18%;
+        background: linear-gradient(90deg, var(--red), var(--orange));
+        transition: width 0.35s var(--ease);
+      }
+
+      .onboard-head .eyebrow {
+        color: var(--red);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        margin-bottom: 10px;
+      }
+
+      .onboard-head h1 {
+        font-size: clamp(32px, 6vw, 42px);
+        letter-spacing: -0.04em;
+        margin-bottom: 8px;
+      }
+
+      .profile-form {
+        margin-top: 28px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 0 16px;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .field select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A1A1A6' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .seg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 4px;
+        min-height: 52px;
+      }
+
+      .seg-btn {
+        border-radius: 10px;
+        font-weight: 650;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .seg-btn.active {
+        background: #fff;
+        color: #000;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(10, 10, 10, 0.72);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-left,
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .hello {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        font-size: 15px;
+      }
+
+      .subhello {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .streak-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 40px;
+        padding: 0 12px 0 8px;
+        border-radius: 999px;
+        background: rgba(255, 149, 0, 0.12);
+        border: 1px solid rgba(255, 149, 0, 0.28);
+        font-weight: 800;
+        color: var(--orange);
+      }
+
+      .streak-chip.dead {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--line);
+        color: var(--muted);
+        filter: grayscale(1);
+      }
+
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        border: 1px solid var(--line);
+      }
+
+      .icon-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+      }
+
+      .workout-main {
+        position: relative;
+        z-index: 1;
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 16px 16px 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .mandate-banner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fff;
+        color: #000;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border: 3px solid #000;
+        box-shadow: 4px 4px 0 var(--red);
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6);
+        animation: pulse 1.6s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.55);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(255, 59, 48, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+        }
+      }
+
+      .cam-stage {
+        border-radius: 24px;
+        overflow: hidden;
+      }
+
+      .cam-frame {
+        position: relative;
+        aspect-ratio: 3 / 4;
+        max-height: 62vh;
+        background: #000;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+
+      @media (min-width: 720px) {
+        .cam-frame {
+          aspect-ratio: 16 / 10;
+          max-height: 52vh;
+        }
+      }
+
+      #video,
+      #overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+      }
+
+      #overlay {
+        pointer-events: none;
+      }
+
+      .cam-placeholder {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(ellipse at center, #1c1c1e 0%, #0a0a0a 70%);
+        z-index: 3;
+      }
+
+      .cam-placeholder.hidden {
+        display: none;
+      }
+
+      .cam-placeholder-inner {
+        text-align: center;
+        display: grid;
+        gap: 14px;
+        place-items: center;
+        color: var(--muted);
+        padding: 24px;
+      }
+
+      .cam-hud {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        z-index: 4;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        pointer-events: none;
+      }
+
+      .hud-pill {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+      }
+
+      .hud-pill.live {
+        color: var(--green);
+        border-color: rgba(48, 209, 88, 0.35);
+      }
+
+      .hud-pill.warn {
+        color: var(--orange);
+      }
+
+      .rep-board {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .rep-card {
+        border-radius: 20px;
+        padding: 18px 16px 14px;
+        background: var(--bg-elev);
+        border: 1px solid var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .rep-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -20% -40% -20%;
+        height: 70%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 59, 48, 0.18),
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .right-card::after {
+        background: radial-gradient(
+          circle,
+          rgba(10, 132, 255, 0.18),
+          transparent 60%
+        );
+      }
+
+      .rep-label {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+
+      .rep-num {
+        font-size: clamp(48px, 12vw, 72px);
+        font-weight: 900;
+        letter-spacing: -0.06em;
+        line-height: 1;
+        margin: 6px 0 10px;
+      }
+
+      .left-card .rep-num {
+        color: var(--red);
+      }
+
+      .right-card .rep-num {
+        color: var(--blue);
+      }
+
+      .rep-bar {
+        height: 8px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+
+      .rep-bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        transition: width 0.25s var(--ease);
+      }
+
+      #bar-left {
+        background: linear-gradient(90deg, #ff453a, #ff9f0a);
+      }
+
+      #bar-right {
+        background: linear-gradient(90deg, #0a84ff, #64d2ff);
+      }
+
+      .rep-target {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        font-family: var(--mono);
+      }
+
+      .action-row {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 10px;
+      }
+
+      .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        border-radius: 20px;
+        padding: 16px 10px;
+      }
+
+      .stat {
+        text-align: center;
+      }
+
+      .stat-k {
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .stat-v {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .week-strip {
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        padding: 16px;
+        background: var(--bg-elev);
+      }
+
+      .week-title {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+
+      .week-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+      }
+
+      .day-cell {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+
+      .day-cell.done {
+        background: rgba(255, 149, 0, 0.18);
+        border-color: rgba(255, 149, 0, 0.45);
+        color: var(--orange);
+      }
+
+      .day-cell.today {
+        outline: 2px solid #fff;
+        outline-offset: 1px;
+      }
+
+      .day-cell.missed {
+        background: rgba(255, 59, 48, 0.1);
+        border-color: rgba(255, 59, 48, 0.25);
+        color: #ff6961;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s var(--ease);
+      }
+
+      .modal.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-card {
+        position: relative;
+        z-index: 1;
+        width: min(400px, calc(100% - 32px));
+        border-radius: 28px;
+        background: #1c1c1e;
+        border: 1px solid var(--line);
+        padding: 28px 24px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        transform: translateY(16px) scale(0.96);
+        transition: transform 0.35s var(--ease);
+      }
+
+      .modal.open .modal-card {
+        transform: none;
+      }
+
+      .commit-card {
+        border: 3px solid #fff;
+        box-shadow:
+          10px 10px 0 var(--red),
+          var(--shadow);
+        overflow: hidden;
+      }
+
+      .flame-burst {
+        display: grid;
+        place-items: center;
+        margin-bottom: 8px;
+        animation: flameBob 1.2s ease-in-out infinite;
+      }
+
+      @keyframes flameBob {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-6px) scale(1.04);
+        }
+      }
+
+      .commit-eyebrow {
+        color: var(--orange);
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .commit-title {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        font-style: italic;
+        margin-bottom: 8px;
+      }
+
+      .commit-sub {
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .commit-timer {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        min-height: 36px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        font-family: var(--mono);
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .modal-x {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 22px;
+        color: var(--muted);
+        line-height: 1;
+      }
+
+      .streak-big-flame {
+        margin: 8px auto 12px;
+      }
+
+      .streak-card h3 {
+        font-size: 28px;
+        letter-spacing: -0.03em;
+        margin-bottom: 8px;
+      }
+
+      .streak-calendar {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(20px);
+        z-index: 200;
+        background: #fff;
+        color: #000;
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.25s,
+          transform 0.25s var(--ease);
+        max-width: calc(100% - 32px);
+        text-align: center;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 480px) {
+        .stats-strip {
+          grid-template-columns: repeat(2, 1fr);
+          row-gap: 14px;
+        }
+
+        .action-row {
+          grid-template-columns: 1fr;
+        }
+
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      #btn-demo.hidden-demo {
+        display: none !important;
+      }
+
+      .avatar-btn {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 0;
+        flex-shrink: 0;
+        background: #1c1c1e;
+      }
+      .avatar-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .avatar-btn .avatar-fallback {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 14px;
+        color: #fff;
+        background: linear-gradient(135deg, #ff3b30, #ff9f0a);
+      }
+      .avatar-btn:hover {
+        border-color: rgba(255, 255, 255, 0.55);
+      }
+      .topbar-left {
+        min-width: 0;
+      }
+      .achieve-dock {
+        position: relative;
+        z-index: 1;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: var(--bg-elev);
+        padding: 14px 14px 12px;
+      }
+      .achieve-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .achieve-head h3 {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+      .achieve-count {
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--orange);
+      }
+      .badge-rail {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      @media (max-width: 520px) {
+        .badge-rail {
+          grid-template-columns: repeat(5, minmax(56px, 1fr));
+          overflow-x: auto;
+          padding-bottom: 4px;
+        }
+      }
+      .badge-item {
+        display: grid;
+        gap: 6px;
+        justify-items: center;
+        text-align: center;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        padding: 0;
+        color: inherit;
+      }
+      .badge-svg-wrap {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        transition:
+          transform 0.2s var(--ease),
+          border-color 0.2s,
+          box-shadow 0.2s;
+        position: relative;
+      }
+      .badge-item.unlocked .badge-svg-wrap {
+        border-color: rgba(255, 149, 0, 0.45);
+        box-shadow:
+          0 0 0 1px rgba(255, 149, 0, 0.15),
+          0 8px 20px rgba(255, 59, 48, 0.12);
+        background: rgba(255, 149, 0, 0.08);
+      }
+      .badge-item.locked .badge-svg-wrap {
+        filter: grayscale(1) brightness(0.55);
+        opacity: 0.55;
+      }
+      .badge-item:hover .badge-svg-wrap {
+        transform: translateY(-2px);
+      }
+      .badge-name {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+        line-height: 1.2;
+        max-width: 64px;
+      }
+      .badge-item.unlocked .badge-name {
+        color: var(--text);
+      }
+      .badge-new::after {
+        content: "NEW";
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        background: var(--red);
+        color: #fff;
+        border-radius: 999px;
+        padding: 2px 5px;
+        border: 1px solid #fff;
+      }
+      .bottom-achieve-nav {
+        position: sticky;
+        bottom: 0;
+        z-index: 25;
+        margin-top: 8px;
+        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(10, 10, 10, 0.88);
+        backdrop-filter: blur(18px);
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .bottom-achieve-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-badge {
+        flex: 0 0 auto;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        display: grid;
+        place-items: center;
+        position: relative;
+        padding: 4px;
+      }
+      .nav-badge svg {
+        width: 32px;
+        height: 32px;
+      }
+      .nav-badge.locked {
+        filter: grayscale(1);
+        opacity: 0.4;
+      }
+      .nav-badge.unlocked {
+        border-color: rgba(255, 149, 0, 0.5);
+        background: rgba(255, 149, 0, 0.1);
+      }
+      .nav-badge.pulse {
+        animation: badgePop 0.6s var(--ease);
+      }
+      @keyframes badgePop {
+        0% {
+          transform: scale(0.8);
+        }
+        50% {
+          transform: scale(1.12);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .pfp-card {
+        text-align: left;
+      }
+      .pfp-preview-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 8px 0 18px;
+      }
+      .pfp-preview {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #fff;
+        box-shadow: 6px 6px 0 var(--red);
+        background: #222;
+        flex-shrink: 0;
+      }
+      .pfp-preview img,
+      .pfp-preview .avatar-fallback {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        font-weight: 900;
+        color: #fff;
+        background: linear-gradient(135deg, #ff3b30, #ff9f0a);
+      }
+      .pfp-actions {
+        display: grid;
+        gap: 8px;
+        flex: 1;
+      }
+      .report-card {
+        text-align: left;
+        width: min(440px, calc(100% - 32px));
+        border: 3px solid #fff;
+        box-shadow:
+          10px 10px 0 var(--yellow),
+          var(--shadow);
+      }
+      .report-eyebrow {
+        color: var(--yellow);
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+      .report-card h2 {
+        font-size: 28px;
+        letter-spacing: -0.03em;
+        margin-bottom: 6px;
+      }
+      .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 16px 0;
+      }
+      .report-stat {
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 12px;
+      }
+      .report-stat .k {
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .report-stat .v {
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+      }
+      .report-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .report-badges .chip {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 149, 0, 0.12);
+        border: 1px solid rgba(255, 149, 0, 0.3);
+        color: var(--orange);
+      }
+      .badge-detail-icon {
+        width: 72px;
+        height: 72px;
+        margin: 8px auto 12px;
+      }
+      .modal-card.center-text {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <section id="view-login" class="view active">
+        <div class="noise"></div>
+        <div class="login-grid">
+          <div class="brand-block">
+            <div class="brand-mark">
+              <svg
+                viewBox="0 0 64 64"
+                width="72"
+                height="72"
+                aria-hidden="true"
+              >
+                <rect
+                  x="4"
+                  y="4"
+                  width="56"
+                  height="56"
+                  rx="14"
+                  fill="#FF3B30"
+                />
+                <path d="M20 38 L28 22 L36 38 Z" fill="#fff" />
+                <rect x="30" y="26" width="14" height="6" rx="2" fill="#fff" />
+                <circle cx="44" cy="29" r="4" fill="#FFD60A" />
+              </svg>
+            </div>
+            <h1 class="brand-title">FORGE</h1>
+            <p class="brand-tag">Forced Strength Protocol</p>
+            <div class="brutal-stamp">DAILY · NO EXCUSE · 15×2</div>
+          </div>
+          <div class="login-card glass">
+            <h2>Masuk untuk di-paksa berotot.</h2>
+            <p class="muted">
+              Setiap hari. Minimum 15 lift kiri &amp; kanan. Streak mati jam
+              00:00 WIB.
+            </p>
+            <button
+              id="btn-google"
+              class="btn btn-primary btn-google"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 48 48">
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.1 35.3 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8H6.2v5.1C9.5 39.6 16.2 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C39.2 36.5 44 32 44 24c0-1.3-.1-2.5-.4-3.5z"
+                />
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+            <button id="btn-demo" class="btn btn-ghost" type="button">
+              Demo Mode (tanpa OAuth)
+            </button>
+            <p class="fine-print">
+              Dengan masuk, kamu setuju dipaksa lift setiap hari. Tidak ada skip
+              button.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-onboard" class="view">
+        <div class="noise"></div>
+        <div class="onboard-wrap">
+          <div class="progress-rail">
+            <div id="onboard-progress" class="progress-fill"></div>
+          </div>
+          <header class="onboard-head">
+            <p class="eyebrow">PERSONAL PROTOCOL</p>
+            <h1>Siapa yang akan di-forge?</h1>
+            <p class="muted">
+              Data ini menentukan target beban &amp; intensitas harianmu.
+            </p>
+          </header>
+          <form id="form-profile" class="profile-form" autocomplete="on">
+            <div class="field">
+              <label for="pf-name">Nama</label>
+              <input
+                id="pf-name"
+                name="name"
+                type="text"
+                required
+                maxlength="40"
+                placeholder="Nama panggilan"
+              />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="pf-weight">Berat Badan (kg)</label>
+                <input
+                  id="pf-weight"
+                  name="weight"
+                  type="number"
+                  required
+                  min="30"
+                  max="250"
+                  step="0.1"
+                  placeholder="70"
+                />
+              </div>
+              <div class="field">
+                <label for="pf-height">Tinggi Badan (cm)</label>
+                <input
+                  id="pf-height"
+                  name="height"
+                  type="number"
+                  required
+                  min="120"
+                  max="230"
+                  step="1"
+                  placeholder="170"
+                />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="pf-age">Umur</label>
+                <input
+                  id="pf-age"
+                  name="age"
+                  type="number"
+                  required
+                  min="13"
+                  max="90"
+                  step="1"
+                  placeholder="25"
+                />
+              </div>
+              <div class="field">
+                <label for="pf-gender">Gender</label>
+                <div class="seg" role="group" aria-label="Gender">
+                  <button
+                    type="button"
+                    class="seg-btn active"
+                    data-gender="male"
+                  >
+                    Male
+                  </button>
+                  <button type="button" class="seg-btn" data-gender="female">
+                    Female
+                  </button>
+                  <button type="button" class="seg-btn" data-gender="other">
+                    Other
+                  </button>
+                </div>
+                <input
+                  type="hidden"
+                  id="pf-gender"
+                  name="gender"
+                  value="male"
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="pf-goal">GOAL</label>
+              <select id="pf-goal" name="goal" required>
+                <option value="" disabled selected>Pilih goal utama</option>
+                <option value="hypertrophy">
+                  Hypertrophy — lengan lebih besar
+                </option>
+                <option value="strength">Strength — angkat lebih berat</option>
+                <option value="consistency">
+                  Consistency — jangan skip sehari pun
+                </option>
+                <option value="rehab">Rehab — rebuild controlled</option>
+                <option value="cut">Cut — jaga otot saat defisit</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              Lock Protocol →
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section id="view-workout" class="view">
+        <div class="noise"></div>
+        <header class="topbar">
+          <div class="topbar-left">
+            <button
+              id="btn-avatar"
+              class="avatar-btn"
+              type="button"
+              title="Ganti foto profil"
+              aria-label="Ganti foto profil"
+            >
+              <span id="avatar-fallback" class="avatar-fallback">F</span>
+              <img id="avatar-img" alt="" hidden />
+            </button>
+            <input id="pfp-file" type="file" accept="image/*" hidden />
+            <div class="mini-mark">
+              <svg viewBox="0 0 32 32" width="28" height="28">
+                <rect width="32" height="32" rx="8" fill="#FF3B30" />
+                <path d="M10 20 L14 12 L18 20 Z" fill="#fff" />
+                <rect x="15" y="14" width="7" height="3" rx="1" fill="#fff" />
+              </svg>
+            </div>
+            <div>
+              <p class="hello" id="hello-name">Hey</p>
+              <p class="subhello">Daily Forced Lift</p>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button
+              id="btn-streak"
+              class="streak-chip"
+              type="button"
+              aria-label="Streak"
+            >
+              <svg
+                class="flame-ico"
+                viewBox="0 0 64 64"
+                width="22"
+                height="22"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="flameGrad" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stop-color="#FF9600" />
+                    <stop offset="45%" stop-color="#FF4B00" />
+                    <stop offset="100%" stop-color="#FFD900" />
+                  </linearGradient>
+                </defs>
+                <path
+                  fill="url(#flameGrad)"
+                  d="M32 6c2 10-10 14-10 26 0 8 6 14 14 14s14-6 14-14c0-6-2-10-4-14 2 4 2 8 0 10-4-8-8-14-14-22z"
+                />
+                <path
+                  fill="#FFF3C4"
+                  opacity="0.9"
+                  d="M32 30c1 4-3 6-3 11 0 3.5 2.5 6 6 6s6-2.5 6-6c0-2.5-1-4-2-6 1 2 1 3.5 0 4.5-2-3.5-4-6.5-7-9.5z"
+                />
+              </svg>
+              <span id="streak-count">0</span>
+            </button>
+            <button
+              id="btn-logout"
+              class="icon-btn"
+              type="button"
+              title="Logout"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <main class="workout-main">
+          <div class="mandate-banner">
+            <span class="pulse-dot"></span>
+            <span
+              >MINIMUM HARI INI: <strong>15 KIRI</strong> ·
+              <strong>15 KANAN</strong></span
+            >
+          </div>
+
+          <div class="cam-stage">
+            <div class="cam-frame">
+              <video id="video" playsinline muted></video>
+              <canvas id="overlay"></canvas>
+              <div id="cam-placeholder" class="cam-placeholder">
+                <div class="cam-placeholder-inner">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                    />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  <p>
+                    Kamera wajib hidup.<br />Badan dari pinggang ke atas, siku
+                    kelihatan.<br />Curl full ROM: luruskan → angkat → turunkan.
+                  </p>
+                  <button
+                    id="btn-start-cam"
+                    class="btn btn-primary"
+                    type="button"
+                  >
+                    Hidupkan Kamera
+                  </button>
+                </div>
+              </div>
+              <div class="cam-hud">
+                <div class="hud-pill" id="hud-status">STANDBY</div>
+                <div class="hud-pill hud-angle" id="hud-angle">∠ —</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rep-board">
+            <div class="rep-card left-card">
+              <p class="rep-label">KIRI</p>
+              <p class="rep-num" id="rep-left">0</p>
+              <div class="rep-bar">
+                <div id="bar-left" class="rep-bar-fill"></div>
+              </div>
+              <p class="rep-target">/ 15</p>
+            </div>
+            <div class="rep-card right-card">
+              <p class="rep-label">KANAN</p>
+              <p class="rep-num" id="rep-right">0</p>
+              <div class="rep-bar">
+                <div id="bar-right" class="rep-bar-fill"></div>
+              </div>
+              <p class="rep-target">/ 15</p>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <button id="btn-reset-reps" class="btn btn-ghost" type="button">
+              Reset Reps
+            </button>
+            <button
+              id="btn-commit"
+              class="btn btn-brutal"
+              type="button"
+              disabled
+            >
+              COMMIT HARI INI
+            </button>
+          </div>
+
+          <section class="stats-strip glass">
+            <div class="stat">
+              <p class="stat-k">Total Lifetime</p>
+              <p class="stat-v" id="stat-lifetime">0</p>
+            </div>
+            <div class="stat">
+              <p class="stat-k">Best Streak</p>
+              <p class="stat-v" id="stat-best">0</p>
+            </div>
+            <div class="stat">
+              <p class="stat-k">Goal</p>
+              <p class="stat-v" id="stat-goal">—</p>
+            </div>
+            <div class="stat">
+              <p class="stat-k">BMI</p>
+              <p class="stat-v" id="stat-bmi">—</p>
+            </div>
+          </section>
+
+          <section class="week-strip">
+            <p class="week-title">7-DAY FORCE MAP</p>
+            <div id="week-days" class="week-days"></div>
+          </section>
+        </main>
+      </section>
+    </div>
+
+    <div id="modal-commit" class="modal" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card commit-card">
+        <div class="flame-burst" aria-hidden="true">
+          <svg
+            class="commit-flame"
+            viewBox="0 0 120 140"
+            width="120"
+            height="140"
+          >
+            <defs>
+              <linearGradient id="cFlame" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#FF6A00" />
+                <stop offset="40%" stop-color="#FF3B00" />
+                <stop offset="78%" stop-color="#FFCC00" />
+                <stop offset="100%" stop-color="#FFE66D" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              filter="url(#glow)"
+              fill="url(#cFlame)"
+              d="M60 8c4 18-18 26-18 48 0 16 12 28 28 28s28-12 28-28c0-12-4-20-8-28 4 8 4 16 0 20-8-16-16-28-30-40z"
+            />
+            <path
+              fill="#FFF6D0"
+              d="M60 58c2 8-6 12-6 22 0 7 5 12 12 12s12-5 12-12c0-5-2-8-4-12 2 4 2 7 0 9-4-7-8-13-14-19z"
+            />
+          </svg>
+        </div>
+        <p class="commit-eyebrow">STREAK +1</p>
+        <h2 class="commit-title">i'm committed</h2>
+        <p class="commit-sub" id="commit-sub">Protocol locked for today.</p>
+        <div class="commit-timer"><span id="commit-countdown">5</span>s</div>
+      </div>
+    </div>
+
+    <div id="modal-streak" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="streak"></div>
+      <div class="modal-card streak-card">
+        <button class="modal-x" data-close="streak" type="button">×</button>
+        <svg
+          class="streak-big-flame"
+          viewBox="0 0 64 64"
+          width="64"
+          height="64"
+        >
+          <defs>
+            <linearGradient id="sFlame" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#FF9600" />
+              <stop offset="45%" stop-color="#FF4B00" />
+              <stop offset="100%" stop-color="#FFD900" />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#sFlame)"
+            d="M32 6c2 10-10 14-10 26 0 8 6 14 14 14s14-6 14-14c0-6-2-10-4-14 2 4 2 8 0 10-4-8-8-14-14-22z"
+          />
+          <path
+            fill="#FFF3C4"
+            d="M32 30c1 4-3 6-3 11 0 3.5 2.5 6 6 6s6-2.5 6-6c0-2.5-1-4-2-6 1 2 1 3.5 0 4.5-2-3.5-4-6.5-7-9.5z"
+          />
+        </svg>
+        <h3 id="streak-modal-count">0 Day Streak</h3>
+        <p class="muted">
+          Streak mati otomatis jam <strong>00:00 WIB</strong> jika belum commit.
+        </p>
+        <div id="streak-calendar" class="streak-calendar"></div>
+      </div>
+    </div>
+
+    <div id="modal-pfp" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="pfp"></div>
+      <div class="modal-card pfp-card">
+        <button class="modal-x" data-close="pfp" type="button">×</button>
+        <p class="commit-eyebrow">PROFILE PHOTO</p>
+        <h2 style="letter-spacing: -0.03em; margin-bottom: 4px">Ganti PFP</h2>
+        <p class="muted">Foto disimpan di profilmu. JPG/PNG, max ~1.5MB.</p>
+        <div class="pfp-preview-row">
+          <div class="pfp-preview" id="pfp-preview"></div>
+          <div class="pfp-actions">
+            <button id="btn-pfp-pick" class="btn btn-primary" type="button">
+              Pilih Foto
+            </button>
+            <button id="btn-pfp-remove" class="btn btn-ghost" type="button">
+              Hapus Foto
+            </button>
+          </div>
+        </div>
+        <button
+          id="btn-pfp-save"
+          class="btn btn-brutal btn-block"
+          type="button"
+        >
+          SAVE PFP
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-report" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="report"></div>
+      <div class="modal-card report-card">
+        <button class="modal-x" data-close="report" type="button">×</button>
+        <p class="report-eyebrow">MONTHLY REPORT</p>
+        <h2 id="report-title">Forge Report</h2>
+        <p class="muted" id="report-sub">Ringkasan 30 hari protokolmu.</p>
+        <div class="report-grid">
+          <div class="report-stat">
+            <p class="k">Commits</p>
+            <p class="v" id="rp-commits">0</p>
+          </div>
+          <div class="report-stat">
+            <p class="k">Total Reps</p>
+            <p class="v" id="rp-reps">0</p>
+          </div>
+          <div class="report-stat">
+            <p class="k">Best Streak</p>
+            <p class="v" id="rp-streak">0</p>
+          </div>
+          <div class="report-stat">
+            <p class="k">Consistency</p>
+            <p class="v" id="rp-consist">0%</p>
+          </div>
+        </div>
+        <div class="report-badges" id="rp-badges"></div>
+        <p
+          class="muted"
+          id="report-note"
+          style="font-size: 12px; margin-bottom: 14px"
+        ></p>
+        <button
+          id="btn-report-close"
+          class="btn btn-primary btn-block"
+          type="button"
+        >
+          i'm locked in
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-badge" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="badge"></div>
+      <div class="modal-card center-text">
+        <button class="modal-x" data-close="badge" type="button">×</button>
+        <div class="badge-detail-icon" id="badge-detail-icon"></div>
+        <h3 id="badge-detail-title">Badge</h3>
+        <p class="muted" id="badge-detail-desc" style="margin: 8px 0 4px"></p>
+        <p
+          class="commit-eyebrow"
+          id="badge-detail-status"
+          style="margin-top: 12px"
+        >
+          LOCKED
+        </p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var APP_CONFIG = {
+          SUPABASE_URL: "https://YOUR_PROJECT_REF.supabase.co",
+          SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY",
+          MIN_REPS: 15,
+          STREAK_TZ: "Asia/Jakarta",
+          STORAGE_KEY: "forge_v1_state",
+        };
+
+        function isConfigured() {
+          var u = String(APP_CONFIG.SUPABASE_URL || "");
+          var k = String(APP_CONFIG.SUPABASE_ANON_KEY || "");
+          if (!u || !k) return false;
+          if (
+            u.indexOf("YOUR_PROJECT_REF") !== -1 ||
+            u.indexOf("YOUR_SUPABASE") !== -1
+          )
+            return false;
+          if (
+            k.indexOf("YOUR_SUPABASE") !== -1 ||
+            k === "YOUR_SUPABASE_ANON_KEY"
+          )
+            return false;
+          if (k.length < 20) return false;
+          return true;
+        }
+
+        var hasCloud =
+          isConfigured() && !!(window.supabase && window.supabase.createClient);
+        var client = null;
+        if (hasCloud) {
+          client = window.supabase.createClient(
+            APP_CONFIG.SUPABASE_URL,
+            APP_CONFIG.SUPABASE_ANON_KEY,
+            {
+              auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+              },
+            },
+          );
+        }
+
+        function readLocal() {
+          try {
+            var raw = localStorage.getItem(APP_CONFIG.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : null;
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function writeLocal(state) {
+          localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function defaultState() {
+          return {
+            user: null,
+            profile: null,
+            streak: 0,
+            bestStreak: 0,
+            lastCommitDate: null,
+            lifetimeReps: 0,
+            history: {},
+            sessionReps: { left: 0, right: 0 },
+            workouts: [],
+            achievements: {},
+            seenAchievements: {},
+            monthlyReportsSeen: {},
+            createdAt: null,
+          };
+        }
+
+        function mapProfile(row) {
+          if (!row) return null;
+          return {
+            id: row.id,
+            name: row.name,
+            weight:
+              row.weight != null ? Number(row.weight) : Number(row.weight_kg),
+            height:
+              row.height != null ? Number(row.height) : Number(row.height_cm),
+            age: Number(row.age),
+            gender: row.gender,
+            goal: row.goal,
+            avatar_url: row.avatar_url || row.avatar || null,
+            created_at: row.created_at || null,
+          };
+        }
+
+        var ForgeDB = {
+          client: client,
+          hasCloud: hasCloud,
+          readLocal: readLocal,
+          writeLocal: writeLocal,
+          defaultState: defaultState,
+          getSession: async function () {
+            if (!client) {
+              var local = readLocal() || defaultState();
+              return local.user ? { user: local.user, demo: true } : null;
+            }
+            var res = await client.auth.getSession();
+            if (res.error) throw res.error;
+            return res.data.session;
+          },
+          signInWithGoogle: async function () {
+            if (!client) throw new Error("Supabase belum dikonfigurasi.");
+            var redirectTo = window.location.origin + window.location.pathname;
+            var res = await client.auth.signInWithOAuth({
+              provider: "google",
+              options: {
+                redirectTo: redirectTo,
+                queryParams: { access_type: "offline", prompt: "consent" },
+              },
+            });
+            if (res.error) throw res.error;
+            return res.data;
+          },
+          signInDemo: async function () {
+            if (hasCloud)
+              throw new Error(
+                "Demo Mode dinonaktifkan karena Supabase sudah terhubung.",
+              );
+            var state = readLocal() || defaultState();
+            state.user = {
+              id: "demo-user",
+              email: "demo@forge.app",
+              name: "Athlete",
+              avatar: null,
+              provider: "demo",
+            };
+            writeLocal(state);
+            return state.user;
+          },
+          signOut: async function () {
+            if (client) await client.auth.signOut();
+            writeLocal(defaultState());
+            return true;
+          },
+          loadProfile: async function (userId) {
+            if (!client || userId === "demo-user") {
+              var state = readLocal() || defaultState();
+              return mapProfile(state.profile) || state.profile;
+            }
+            var res = await client
+              .from("profiles")
+              .select("*")
+              .eq("id", userId)
+              .maybeSingle();
+            if (res.error) throw res.error;
+            return mapProfile(res.data);
+          },
+          saveProfile: async function (userId, profile) {
+            var state = readLocal() || defaultState();
+            var normalized = {
+              id: userId,
+              name: profile.name,
+              weight: profile.weight,
+              height: profile.height,
+              age: profile.age,
+              gender: profile.gender,
+              goal: profile.goal,
+              avatar_url: profile.avatar_url || null,
+              created_at: profile.created_at || new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            };
+            state.profile = normalized;
+            if (state.user) {
+              state.user.name = profile.name;
+              if (profile.avatar_url !== undefined)
+                state.user.avatar = profile.avatar_url;
+            }
+            writeLocal(state);
+            if (!client || userId === "demo-user") return normalized;
+            var row = {
+              id: userId,
+              name: profile.name,
+              weight_kg: profile.weight,
+              height_cm: profile.height,
+              age: profile.age,
+              gender: profile.gender,
+              goal: profile.goal,
+              avatar_url: profile.avatar_url || null,
+              updated_at: new Date().toISOString(),
+            };
+            if (profile.created_at) row.created_at = profile.created_at;
+            var res = await client
+              .from("profiles")
+              .upsert(row)
+              .select()
+              .single();
+            if (res.error) throw res.error;
+            return mapProfile(res.data);
+          },
+          loadProgress: async function (userId) {
+            var state = readLocal() || defaultState();
+            if (!client || userId === "demo-user") {
+              return {
+                streak: state.streak || 0,
+                bestStreak: state.bestStreak || 0,
+                lastCommitDate: state.lastCommitDate || null,
+                lifetimeReps: state.lifetimeReps || 0,
+                history: state.history || {},
+              };
+            }
+            var res = await client
+              .from("progress")
+              .select("*")
+              .eq("user_id", userId)
+              .maybeSingle();
+            if (res.error) throw res.error;
+            if (!res.data) {
+              return {
+                streak: 0,
+                bestStreak: 0,
+                lastCommitDate: null,
+                lifetimeReps: 0,
+                history: {},
+              };
+            }
+            return {
+              streak: res.data.streak || 0,
+              bestStreak: res.data.best_streak || 0,
+              lastCommitDate: res.data.last_commit_date || null,
+              lifetimeReps: res.data.lifetime_reps || 0,
+              history: res.data.history || {},
+            };
+          },
+          saveProgress: async function (userId, progress) {
+            var state = readLocal() || defaultState();
+            state.streak = progress.streak;
+            state.bestStreak = progress.bestStreak;
+            state.lastCommitDate = progress.lastCommitDate;
+            state.lifetimeReps = progress.lifetimeReps;
+            state.history = progress.history;
+            writeLocal(state);
+            if (!client || userId === "demo-user") return progress;
+            var row = {
+              user_id: userId,
+              streak: progress.streak,
+              best_streak: progress.bestStreak,
+              last_commit_date: progress.lastCommitDate,
+              lifetime_reps: progress.lifetimeReps,
+              history: progress.history,
+              updated_at: new Date().toISOString(),
+            };
+            var res = await client
+              .from("progress")
+              .upsert(row)
+              .select()
+              .single();
+            if (res.error) throw res.error;
+            return progress;
+          },
+          logWorkout: async function (userId, payload) {
+            var state = readLocal() || defaultState();
+            if (!state.workouts) state.workouts = [];
+            state.workouts.push(
+              Object.assign({}, payload, { at: new Date().toISOString() }),
+            );
+            writeLocal(state);
+            if (!client || userId === "demo-user") return payload;
+            var res = await client
+              .from("workouts")
+              .insert({
+                user_id: userId,
+                left_reps: payload.left,
+                right_reps: payload.right,
+                total_reps: payload.left + payload.right,
+                committed: !!payload.committed,
+                workout_date: payload.date,
+              })
+              .select()
+              .single();
+            if (res.error) throw res.error;
+            return res.data;
+          },
+          loadMeta: async function (userId) {
+            var state = readLocal() || defaultState();
+            if (!client || userId === "demo-user") {
+              return {
+                achievements: state.achievements || {},
+                seenAchievements: state.seenAchievements || {},
+                monthlyReportsSeen: state.monthlyReportsSeen || {},
+                createdAt:
+                  state.createdAt ||
+                  (state.profile && state.profile.created_at) ||
+                  null,
+              };
+            }
+            var res = await client
+              .from("progress")
+              .select(
+                "achievements,seen_achievements,monthly_reports_seen,created_at",
+              )
+              .eq("user_id", userId)
+              .maybeSingle();
+            if (res.error) throw res.error;
+            var d = res.data || {};
+            return {
+              achievements: d.achievements || state.achievements || {},
+              seenAchievements:
+                d.seen_achievements || state.seenAchievements || {},
+              monthlyReportsSeen:
+                d.monthly_reports_seen || state.monthlyReportsSeen || {},
+              createdAt:
+                state.createdAt ||
+                (state.profile && state.profile.created_at) ||
+                null,
+            };
+          },
+          saveMeta: async function (userId, meta) {
+            var state = readLocal() || defaultState();
+            state.achievements = meta.achievements || {};
+            state.seenAchievements = meta.seenAchievements || {};
+            state.monthlyReportsSeen = meta.monthlyReportsSeen || {};
+            if (meta.createdAt) state.createdAt = meta.createdAt;
+            writeLocal(state);
+            if (!client || userId === "demo-user") return meta;
+            var row = {
+              user_id: userId,
+              achievements: meta.achievements || {},
+              seen_achievements: meta.seenAchievements || {},
+              monthly_reports_seen: meta.monthlyReportsSeen || {},
+              updated_at: new Date().toISOString(),
+            };
+            var res = await client
+              .from("progress")
+              .upsert(row)
+              .select()
+              .single();
+            if (res.error) throw res.error;
+            return meta;
+          },
+        };
+
+        var TZ = APP_CONFIG.STREAK_TZ || "Asia/Jakarta";
+
+        function partsInTZ(date, timeZone) {
+          var fmt = new Intl.DateTimeFormat("en-CA", {
+            timeZone: timeZone,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hourCycle: "h23",
+          });
+          var bag = {};
+          var parts = fmt.formatToParts(date);
+          for (var i = 0; i < parts.length; i++) {
+            var p = parts[i];
+            if (p.type !== "literal") bag[p.type] = p.value;
+          }
+          return bag;
+        }
+
+        function dateKey(date) {
+          var p = partsInTZ(date || new Date(), TZ);
+          return p.year + "-" + p.month + "-" + p.day;
+        }
+
+        function yesterdayKey(fromDate) {
+          var p = partsInTZ(fromDate || new Date(), TZ);
+          var utc = Date.UTC(
+            Number(p.year),
+            Number(p.month) - 1,
+            Number(p.day),
+          );
+          var y = new Date(utc - 24 * 60 * 60 * 1000);
+          var yy = y.getUTCFullYear();
+          var mm = String(y.getUTCMonth() + 1).padStart(2, "0");
+          var dd = String(y.getUTCDate()).padStart(2, "0");
+          return yy + "-" + mm + "-" + dd;
+        }
+
+        function addDaysKey(key, delta) {
+          var bits = key.split("-").map(Number);
+          var utc = Date.UTC(bits[0], bits[1] - 1, bits[2]);
+          var n = new Date(utc + delta * 24 * 60 * 60 * 1000);
+          var yy = n.getUTCFullYear();
+          var mm = String(n.getUTCMonth() + 1).padStart(2, "0");
+          var dd = String(n.getUTCDate()).padStart(2, "0");
+          return yy + "-" + mm + "-" + dd;
+        }
+
+        function evaluateStreak(progress) {
+          var today = dateKey(new Date());
+          var yday = yesterdayKey(new Date());
+          var streak = progress.streak || 0;
+          var best = progress.bestStreak || 0;
+          var last = progress.lastCommitDate || null;
+          var changed = false;
+          if (!last) {
+            if (streak !== 0) {
+              streak = 0;
+              changed = true;
+            }
+          } else if (last === today || last === yday) {
+          } else {
+            if (streak !== 0) {
+              streak = 0;
+              changed = true;
+            }
+          }
+          return {
+            streak: streak,
+            bestStreak: Math.max(best, streak),
+            lastCommitDate: last,
+            lifetimeReps: progress.lifetimeReps || 0,
+            history: progress.history || {},
+            changed: changed,
+            today: today,
+            committedToday: last === today,
+          };
+        }
+
+        function applyCommit(progress, left, right) {
+          var today = dateKey(new Date());
+          var yday = yesterdayKey(new Date());
+          var history = Object.assign({}, progress.history || {});
+          history[today] = {
+            left: left,
+            right: right,
+            total: left + right,
+            committed: true,
+          };
+          var streak = progress.streak || 0;
+          var last = progress.lastCommitDate || null;
+          if (last === today) {
+          } else if (last === yday) {
+            streak = streak + 1;
+          } else {
+            streak = 1;
+          }
+          var bestStreak = Math.max(progress.bestStreak || 0, streak);
+          var lifetimeReps = (progress.lifetimeReps || 0) + left + right;
+          return {
+            streak: streak,
+            bestStreak: bestStreak,
+            lastCommitDate: today,
+            lifetimeReps: lifetimeReps,
+            history: history,
+            today: today,
+            committedToday: true,
+          };
+        }
+
+        function weekMap(history) {
+          var today = dateKey(new Date());
+          var days = [];
+          for (var i = 6; i >= 0; i--) {
+            var key = addDaysKey(today, -i);
+            var bits = key.split("-").map(Number);
+            var labelDate = new Date(Date.UTC(bits[0], bits[1] - 1, bits[2]));
+            var label = new Intl.DateTimeFormat("id-ID", {
+              weekday: "short",
+              timeZone: "UTC",
+            }).format(labelDate);
+            var entry = history && history[key];
+            var status = "empty";
+            if (entry && entry.committed) status = "done";
+            else if (key < today) status = "missed";
+            if (key === today) status = status === "done" ? "done" : "today";
+            days.push({
+              key: key,
+              label: label.replace(".", "").slice(0, 2).toUpperCase(),
+              status: status,
+              entry: entry,
+            });
+          }
+          return days;
+        }
+
+        function msUntilMidnightWIB() {
+          var now = new Date();
+          var p = partsInTZ(now, TZ);
+          var passed =
+            (Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second)) *
+            1000;
+          return 24 * 60 * 60 * 1000 - passed;
+        }
+
+        var ForgeStreak = {
+          dateKey: dateKey,
+          yesterdayKey: yesterdayKey,
+          evaluateStreak: evaluateStreak,
+          applyCommit: applyCommit,
+          weekMap: weekMap,
+          msUntilMidnightWIB: msUntilMidnightWIB,
+          TZ: TZ,
+        };
+
+        var MIN_VIS = 0.28;
+        var UP_ENTER = 72;
+        var UP_HARD = 58;
+        var DOWN_ENTER = 135;
+        var DOWN_HARD = 152;
+        var SMOOTH = 0.35;
+        var HOLD_UP = 2;
+        var HOLD_DOWN = 2;
+        var MIN_ROM = 40;
+        var COOLDOWN_MS = 420;
+
+        function angle3(a, b, c) {
+          var abx = a.x - b.x;
+          var aby = a.y - b.y;
+          var abz = (a.z || 0) - (b.z || 0);
+          var cbx = c.x - b.x;
+          var cby = c.y - b.y;
+          var cbz = (c.z || 0) - (b.z || 0);
+          var dot = abx * cbx + aby * cby + abz * cbz;
+          var magAB = Math.sqrt(abx * abx + aby * aby + abz * abz);
+          var magCB = Math.sqrt(cbx * cbx + cby * cby + cbz * cbz);
+          if (magAB < 1e-6 || magCB < 1e-6) return null;
+          var cos = dot / (magAB * magCB);
+          cos = Math.min(1, Math.max(-1, cos));
+          return (Math.acos(cos) * 180) / Math.PI;
+        }
+
+        function lmOk(p) {
+          if (!p) return false;
+          if (p.visibility == null && p.presence == null) return true;
+          var v = p.visibility != null ? p.visibility : 1;
+          var pr = p.presence != null ? p.presence : 1;
+          return v >= MIN_VIS && pr >= 0.35;
+        }
+
+        function pickPoint(landmarks, world, i) {
+          var p = landmarks && landmarks[i];
+          if (!lmOk(p)) return null;
+          var w = world && world[i];
+          if (w && lmOk(w)) {
+            return { x: w.x, y: w.y, z: w.z || 0, visibility: p.visibility };
+          }
+          return { x: p.x, y: p.y, z: p.z || 0, visibility: p.visibility };
+        }
+
+        function sideBundle(landmarks, world, shoulderI, elbowI, wristI, hipI) {
+          var shoulderImg = pickPoint(landmarks, null, shoulderI);
+          var elbowImg = pickPoint(landmarks, null, elbowI);
+          var wristImg = pickPoint(landmarks, null, wristI);
+          var hipImg = pickPoint(landmarks, null, hipI);
+          if (!shoulderImg || !elbowImg || !wristImg) {
+            return { angle: null, conf: 0, curlScore: 0 };
+          }
+          var shoulder = pickPoint(landmarks, world, shoulderI) || shoulderImg;
+          var elbow = pickPoint(landmarks, world, elbowI) || elbowImg;
+          var wrist = pickPoint(landmarks, world, wristI) || wristImg;
+          var ang = angle3(shoulder, elbow, wrist);
+          if (ang == null) ang = angle3(shoulderImg, elbowImg, wristImg);
+          if (ang == null) return { angle: null, conf: 0, curlScore: 0 };
+          var conf = 1;
+          if (shoulderImg.visibility != null)
+            conf = Math.min(conf, shoulderImg.visibility);
+          if (elbowImg.visibility != null)
+            conf = Math.min(conf, elbowImg.visibility);
+          if (wristImg.visibility != null)
+            conf = Math.min(conf, wristImg.visibility);
+          var upperLen = Math.hypot(
+            shoulderImg.x - elbowImg.x,
+            shoulderImg.y - elbowImg.y,
+          );
+          var foreLen = Math.hypot(
+            elbowImg.x - wristImg.x,
+            elbowImg.y - wristImg.y,
+          );
+          if (upperLen < 0.02 || foreLen < 0.02) conf *= 0.45;
+          var wristRise = elbowImg.y - wristImg.y;
+          var curlScore = wristRise;
+          if (hipImg) {
+            var trunk = Math.abs(shoulderImg.y - hipImg.y) + 1e-6;
+            curlScore = wristRise / trunk;
+          }
+          return {
+            angle: ang,
+            conf: conf,
+            curlScore: curlScore,
+            elbow: elbowImg,
+            wrist: wristImg,
+            shoulder: shoulderImg,
+          };
+        }
+
+        function sideAngles(landmarks, world) {
+          return {
+            left: sideBundle(landmarks, world, 11, 13, 15, 23),
+            right: sideBundle(landmarks, world, 12, 14, 16, 24),
+          };
+        }
+
+        function createSideState() {
+          return {
+            stage: "down",
+            count: 0,
+            angle: null,
+            smooth: null,
+            minAngle: 999,
+            maxAngle: 0,
+            upHold: 0,
+            downHold: 0,
+            lastRepAt: 0,
+            conf: 0,
+          };
+        }
+
+        function createRepState() {
+          return { left: createSideState(), right: createSideState() };
+        }
+
+        function feedSide(sideState, bundle, now) {
+          if (!bundle || bundle.angle == null || Number.isNaN(bundle.angle)) {
+            sideState.upHold = 0;
+            sideState.downHold = 0;
+            return { counted: false };
+          }
+          if (bundle.conf < 0.22) {
+            return { counted: false };
+          }
+          var raw = bundle.angle;
+          if (sideState.smooth == null) sideState.smooth = raw;
+          else
+            sideState.smooth = sideState.smooth * (1 - SMOOTH) + raw * SMOOTH;
+          var angle = sideState.smooth;
+          sideState.angle = angle;
+          sideState.conf = bundle.conf;
+          var counted = false;
+
+          if (angle < sideState.minAngle) sideState.minAngle = angle;
+          if (angle > sideState.maxAngle) sideState.maxAngle = angle;
+
+          if (sideState.stage === "down") {
+            sideState.downHold = 0;
+            if (angle <= UP_ENTER) sideState.upHold += 1;
+            else sideState.upHold = Math.max(0, sideState.upHold - 1);
+            if (sideState.upHold >= HOLD_UP || angle <= UP_HARD) {
+              sideState.stage = "up";
+              sideState.upHold = 0;
+              sideState.minAngle = angle;
+              sideState.maxAngle = angle;
+            }
+          } else {
+            sideState.upHold = 0;
+            if (angle >= DOWN_ENTER) sideState.downHold += 1;
+            else sideState.downHold = Math.max(0, sideState.downHold - 1);
+            var rom = sideState.maxAngle - sideState.minAngle;
+            var peaked = sideState.minAngle <= UP_ENTER + 8;
+            var ready = sideState.downHold >= HOLD_DOWN || angle >= DOWN_HARD;
+            var cooled =
+              !sideState.lastRepAt || now - sideState.lastRepAt >= COOLDOWN_MS;
+            if (ready && peaked && rom >= MIN_ROM && cooled) {
+              sideState.stage = "down";
+              sideState.downHold = 0;
+              sideState.count += 1;
+              sideState.lastRepAt = now;
+              sideState.minAngle = 999;
+              sideState.maxAngle = 0;
+              counted = true;
+            } else if (ready && !peaked) {
+              sideState.stage = "down";
+              sideState.downHold = 0;
+              sideState.minAngle = 999;
+              sideState.maxAngle = 0;
+            }
+          }
+          return { counted: counted };
+        }
+
+        function createTracker(hooks) {
+          var state = createRepState();
+          var pose = null;
+          var camera = null;
+          var running = false;
+          var busy = false;
+          var videoEl = null;
+          var canvasEl = null;
+          var ctx = null;
+          var rafId = 0;
+
+          function paintArm(ctx2, bundle, color) {
+            if (!bundle || !bundle.elbow || !bundle.wrist || !bundle.shoulder)
+              return;
+            var s = bundle.shoulder;
+            var e = bundle.elbow;
+            var w = bundle.wrist;
+            var W = canvasEl.width;
+            var H = canvasEl.height;
+            ctx2.strokeStyle = color;
+            ctx2.fillStyle = color;
+            ctx2.lineWidth = 3;
+            ctx2.beginPath();
+            ctx2.moveTo(s.x * W, s.y * H);
+            ctx2.lineTo(e.x * W, e.y * H);
+            ctx2.lineTo(w.x * W, w.y * H);
+            ctx2.stroke();
+            ctx2.beginPath();
+            ctx2.arc(e.x * W, e.y * H, 6, 0, Math.PI * 2);
+            ctx2.fill();
+          }
+
+          function draw(results) {
+            if (!ctx || !canvasEl || !videoEl) return;
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            if (!results.poseLandmarks) return;
+            var landmarks = results.poseLandmarks;
+            var world = results.poseWorldLandmarks || null;
+            if (window.drawConnectors && window.POSE_CONNECTIONS) {
+              drawConnectors(ctx, landmarks, POSE_CONNECTIONS, {
+                color: "rgba(255,255,255,0.35)",
+                lineWidth: 2,
+              });
+            }
+            if (window.drawLandmarks) {
+              drawLandmarks(ctx, landmarks, {
+                color: "#FF3B30",
+                lineWidth: 1,
+                radius: 2.5,
+              });
+            }
+            var sides = sideAngles(landmarks, world);
+            var now = Date.now();
+            var leftHit = feedSide(state.left, sides.left, now);
+            var rightHit = feedSide(state.right, sides.right, now);
+            if (sides.left && sides.left.angle != null)
+              paintArm(
+                ctx,
+                sides.left,
+                state.left.stage === "up" ? "#FF9F0A" : "#FF3B30",
+              );
+            if (sides.right && sides.right.angle != null)
+              paintArm(
+                ctx,
+                sides.right,
+                state.right.stage === "up" ? "#64D2FF" : "#0A84FF",
+              );
+            if (leftHit.counted && hooks && hooks.onRep)
+              hooks.onRep("left", state.left.count);
+            if (rightHit.counted && hooks && hooks.onRep)
+              hooks.onRep("right", state.right.count);
+            if (hooks && hooks.onAngle) {
+              hooks.onAngle({
+                left: state.left.angle,
+                right: state.right.angle,
+                leftStage: state.left.stage,
+                rightStage: state.right.stage,
+                leftConf: state.left.conf,
+                rightConf: state.right.conf,
+              });
+            }
+          }
+
+          async function onFrame() {
+            if (!pose || !videoEl || !running || busy) return;
+            if (videoEl.readyState < 2) return;
+            busy = true;
+            try {
+              await pose.send({ image: videoEl });
+            } catch (e) {
+            } finally {
+              busy = false;
+            }
+          }
+
+          async function start(video, canvas) {
+            videoEl = video;
+            canvasEl = canvas;
+            ctx = canvas.getContext("2d");
+            if (!window.Pose)
+              throw new Error("MediaPipe Pose tidak termuat. Cek koneksi CDN.");
+            if (pose && pose.close) {
+              try {
+                pose.close();
+              } catch (e) {}
+            }
+            pose = new Pose({
+              locateFile: function (file) {
+                return "https://cdn.jsdelivr.net/npm/@mediapipe/pose/" + file;
+              },
+            });
+            pose.setOptions({
+              modelComplexity: 2,
+              smoothLandmarks: true,
+              enableSegmentation: false,
+              smoothSegmentation: false,
+              minDetectionConfidence: 0.5,
+              minTrackingConfidence: 0.5,
+            });
+            pose.onResults(function (results) {
+              if (!canvasEl || !videoEl) return;
+              var vw = videoEl.videoWidth || 640;
+              var vh = videoEl.videoHeight || 480;
+              if (canvasEl.width !== vw || canvasEl.height !== vh) {
+                canvasEl.width = vw;
+                canvasEl.height = vh;
+              }
+              draw(results);
+            });
+            var stream = await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: {
+                facingMode: "user",
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 30 },
+              },
+            });
+            videoEl.srcObject = stream;
+            videoEl.setAttribute("playsinline", "true");
+            videoEl.muted = true;
+            await videoEl.play();
+            running = true;
+            if (window.Camera) {
+              camera = new Camera(videoEl, {
+                onFrame: onFrame,
+                width: 1280,
+                height: 720,
+              });
+              camera.start();
+            } else {
+              var loop = async function () {
+                if (!running) return;
+                await onFrame();
+                rafId = requestAnimationFrame(loop);
+              };
+              rafId = requestAnimationFrame(loop);
+            }
+            if (hooks && hooks.onStatus) hooks.onStatus("live");
+          }
+
+          function stop() {
+            running = false;
+            if (rafId) cancelAnimationFrame(rafId);
+            if (camera && camera.stop) camera.stop();
+            if (videoEl && videoEl.srcObject) {
+              videoEl.srcObject.getTracks().forEach(function (t) {
+                t.stop();
+              });
+              videoEl.srcObject = null;
+            }
+            if (ctx && canvasEl)
+              ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            if (hooks && hooks.onStatus) hooks.onStatus("stop");
+          }
+
+          function resetCounts() {
+            state.left = createSideState();
+            state.right = createSideState();
+          }
+
+          function setCounts(left, right) {
+            state.left.count = left || 0;
+            state.right.count = right || 0;
+          }
+
+          function getCounts() {
+            return { left: state.left.count, right: state.right.count };
+          }
+
+          return {
+            start: start,
+            stop: stop,
+            resetCounts: resetCounts,
+            setCounts: setCounts,
+            getCounts: getCounts,
+            state: state,
+          };
+        }
+
+        var ForgePose = {
+          createTracker: createTracker,
+          UP_ENTER: UP_ENTER,
+          DOWN_ENTER: DOWN_ENTER,
+        };
+
+        var BADGES = [
+          {
+            id: "first_fire",
+            name: "First Fire",
+            desc: "Commit workout pertama kali.",
+            check: function (c) {
+              return c.totalCommits >= 1;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><defs><linearGradient id="b1" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FF9600"/><stop offset="100%" stop-color="#FFD900"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#1a1208" : "#111") +
+                '" stroke="' +
+                (u ? "#FF9F0A" : "#333") +
+                '" stroke-width="2"/><path fill="url(#b1)" d="M32 12c2 8-8 12-8 22 0 7 5 12 12 12s12-5 12-12c0-5-2-8-3-12 2 3 2 6 0 8-3-6-7-12-13-18z"/><path fill="#FFF3C4" d="M32 30c1 3-2 5-2 9 0 3 2 5 5 5s5-2 5-5c0-2-1-3-2-5 1 1 1 3 0 4-2-3-4-5-6-8z"/></svg>'
+              );
+            },
+          },
+          {
+            id: "iron_week",
+            name: "Iron Week",
+            desc: "Streak 7 hari berturut-turut.",
+            check: function (c) {
+              return c.bestStreak >= 7 || c.streak >= 7;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#0d1b12" : "#111") +
+                '" stroke="' +
+                (u ? "#30D158" : "#333") +
+                '" stroke-width="2"/><path d="M18 36h28M22 28h20" stroke="' +
+                (u ? "#30D158" : "#666") +
+                '" stroke-width="3" stroke-linecap="round"/><rect x="14" y="24" width="8" height="16" rx="2" fill="' +
+                (u ? "#FFD60A" : "#555") +
+                '"/><rect x="42" y="24" width="8" height="16" rx="2" fill="' +
+                (u ? "#FFD60A" : "#555") +
+                '"/><text x="32" y="48" text-anchor="middle" font-size="10" font-weight="800" fill="' +
+                (u ? "#fff" : "#777") +
+                '">7D</text></svg>'
+              );
+            },
+          },
+          {
+            id: "rep_machine",
+            name: "Rep Machine",
+            desc: "Total lifetime 500 reps.",
+            check: function (c) {
+              return c.lifetimeReps >= 500;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#101820" : "#111") +
+                '" stroke="' +
+                (u ? "#0A84FF" : "#333") +
+                '" stroke-width="2"/><circle cx="32" cy="32" r="14" fill="none" stroke="' +
+                (u ? "#64D2FF" : "#555") +
+                '" stroke-width="3"/><path d="M32 18v14l10 6" fill="none" stroke="' +
+                (u ? "#fff" : "#777") +
+                '" stroke-width="3" stroke-linecap="round"/><text x="32" y="54" text-anchor="middle" font-size="8" font-weight="800" fill="' +
+                (u ? "#64D2FF" : "#666") +
+                '">500</text></svg>'
+              );
+            },
+          },
+          {
+            id: "bilateral",
+            name: "Bilateral",
+            desc: "Selesaikan 15 kiri & 15 kanan dalam satu sesi.",
+            check: function (c) {
+              return c.bilateralSessions >= 1;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#1a0a12" : "#111") +
+                '" stroke="' +
+                (u ? "#FF375F" : "#333") +
+                '" stroke-width="2"/><circle cx="22" cy="32" r="10" fill="none" stroke="' +
+                (u ? "#FF3B30" : "#555") +
+                '" stroke-width="3"/><circle cx="42" cy="32" r="10" fill="none" stroke="' +
+                (u ? "#0A84FF" : "#555") +
+                '" stroke-width="3"/><text x="22" y="36" text-anchor="middle" font-size="9" font-weight="900" fill="' +
+                (u ? "#FF3B30" : "#666") +
+                '">L</text><text x="42" y="36" text-anchor="middle" font-size="9" font-weight="900" fill="' +
+                (u ? "#0A84FF" : "#666") +
+                '">R</text></svg>'
+              );
+            },
+          },
+          {
+            id: "no_escape",
+            name: "No Escape",
+            desc: "Streak 30 hari. Tidak ada kabur.",
+            check: function (c) {
+              return c.bestStreak >= 30 || c.streak >= 30;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><rect x="2" y="2" width="60" height="60" rx="12" fill="' +
+                (u ? "#fff" : "#1a1a1a") +
+                '"/><rect x="8" y="8" width="48" height="48" fill="' +
+                (u ? "#0A0A0A" : "#111") +
+                '"/><text x="32" y="28" text-anchor="middle" font-size="9" font-weight="900" fill="#FF3B30">NO</text><text x="32" y="42" text-anchor="middle" font-size="8" font-weight="900" fill="' +
+                (u ? "#fff" : "#666") +
+                '">ESCAPE</text><rect x="12" y="12" width="6" height="6" fill="#FFD60A"/><rect x="46" y="46" width="6" height="6" fill="#FF3B30"/></svg>'
+              );
+            },
+          },
+          {
+            id: "early_forge",
+            name: "Early Forge",
+            desc: "Commit sebelum jam 09:00 WIB.",
+            check: function (c) {
+              return c.earlyCommits >= 1;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#1a1408" : "#111") +
+                '" stroke="' +
+                (u ? "#FFD60A" : "#333") +
+                '" stroke-width="2"/><circle cx="32" cy="34" r="12" fill="' +
+                (u ? "#FFD60A" : "#444") +
+                '"/><path d="M32 10v6M32 52v6M10 34h6M48 34h6M16 18l4 4M44 18l-4 4" stroke="' +
+                (u ? "#FF9F0A" : "#555") +
+                '" stroke-width="3" stroke-linecap="round"/></svg>'
+              );
+            },
+          },
+          {
+            id: "midnight_oil",
+            name: "Midnight Oil",
+            desc: "Commit setelah jam 22:00 WIB.",
+            check: function (c) {
+              return c.lateCommits >= 1;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#0b1020" : "#111") +
+                '" stroke="' +
+                (u ? "#5E5CE6" : "#333") +
+                '" stroke-width="2"/><path d="M38 18a14 14 0 1 0 10 22 12 12 0 1 1-10-22z" fill="' +
+                (u ? "#BF5AF2" : "#444") +
+                '"/><circle cx="20" cy="18" r="1.5" fill="' +
+                (u ? "#fff" : "#555") +
+                '"/><circle cx="48" cy="22" r="1.2" fill="' +
+                (u ? "#fff" : "#555") +
+                '"/><circle cx="16" cy="40" r="1" fill="' +
+                (u ? "#fff" : "#555") +
+                '"/></svg>'
+              );
+            },
+          },
+          {
+            id: "ton_club",
+            name: "Ton Club",
+            desc: "Total lifetime 1000 reps.",
+            check: function (c) {
+              return c.lifetimeReps >= 1000;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#1a1008" : "#111") +
+                '" stroke="' +
+                (u ? "#FF9F0A" : "#333") +
+                '" stroke-width="2"/><path d="M16 40 L32 16 L48 40 Z" fill="none" stroke="' +
+                (u ? "#FFD60A" : "#555") +
+                '" stroke-width="3"/><text x="32" y="38" text-anchor="middle" font-size="11" font-weight="900" fill="' +
+                (u ? "#fff" : "#666") +
+                '">1K</text></svg>'
+              );
+            },
+          },
+          {
+            id: "profile_locked",
+            name: "Identity",
+            desc: "Lengkapi profil + pasang PFP.",
+            check: function (c) {
+              return c.hasProfile && c.hasAvatar;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#121218" : "#111") +
+                '" stroke="' +
+                (u ? "#A78BFA" : "#333") +
+                '" stroke-width="2"/><circle cx="32" cy="24" r="8" fill="' +
+                (u ? "#E5E5EA" : "#555") +
+                '"/><path d="M16 48c4-10 28-10 32 0" fill="' +
+                (u ? "#E5E5EA" : "#555") +
+                '"/><circle cx="48" cy="44" r="8" fill="' +
+                (u ? "#30D158" : "#333") +
+                '"/><path d="M45 44l2 2 4-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>'
+              );
+            },
+          },
+          {
+            id: "month_one",
+            name: "Month One",
+            desc: "Bertahan 1 bulan sejak akun dibuat.",
+            check: function (c) {
+              return c.accountDays >= 30;
+            },
+            svg: function (u) {
+              return (
+                '<svg viewBox="0 0 64 64" width="40" height="40"><circle cx="32" cy="32" r="30" fill="' +
+                (u ? "#08141a" : "#111") +
+                '" stroke="' +
+                (u ? "#64D2FF" : "#333") +
+                '" stroke-width="2"/><rect x="18" y="16" width="28" height="32" rx="4" fill="none" stroke="' +
+                (u ? "#fff" : "#555") +
+                '" stroke-width="2"/><path d="M18 24h28" stroke="' +
+                (u ? "#FF3B30" : "#444") +
+                '" stroke-width="4"/><text x="32" y="42" text-anchor="middle" font-size="12" font-weight="900" fill="' +
+                (u ? "#64D2FF" : "#666") +
+                '">30</text></svg>'
+              );
+            },
+          },
+        ];
+
+        function accountAgeDays(createdAt) {
+          if (!createdAt) return 0;
+          var t = new Date(createdAt).getTime();
+          if (!t) return 0;
+          return Math.floor((Date.now() - t) / (24 * 60 * 60 * 1000));
+        }
+
+        function monthIndexFromCreated(createdAt, now) {
+          if (!createdAt) return 0;
+          var c = new Date(createdAt);
+          var n = now || new Date();
+          var months =
+            (n.getFullYear() - c.getFullYear()) * 12 +
+            (n.getMonth() - c.getMonth());
+          if (n.getDate() < c.getDate()) months -= 1;
+          return Math.max(0, months);
+        }
+
+        function anniversaryKeysDue(createdAt, seenMap) {
+          if (!createdAt) return [];
+          var idx = monthIndexFromCreated(createdAt, new Date());
+          var due = [];
+          for (var m = 1; m <= idx; m++) {
+            var key = "m" + m;
+            if (!seenMap || !seenMap[key]) due.push({ key: key, month: m });
+          }
+          return due;
+        }
+
+        function buildCtx(appState) {
+          var p = appState.profile || {};
+          var pr = appState.progress || {};
+          var hist = pr.history || {};
+          var commits = 0;
+          var bilateral = 0;
+          Object.keys(hist).forEach(function (k) {
+            var e = hist[k];
+            if (e && e.committed) {
+              commits += 1;
+              if ((e.left || 0) >= 15 && (e.right || 0) >= 15) bilateral += 1;
+            }
+          });
+          var created =
+            p.created_at ||
+            appState.metaCreatedAt ||
+            (appState.user && appState.user.created_at) ||
+            null;
+          return {
+            totalCommits: commits,
+            bilateralSessions: Math.max(
+              bilateral,
+              appState.bilateralSessions || 0,
+            ),
+            lifetimeReps: pr.lifetimeReps || 0,
+            streak: pr.streak || 0,
+            bestStreak: pr.bestStreak || 0,
+            earlyCommits: appState.earlyCommits || 0,
+            lateCommits: appState.lateCommits || 0,
+            hasProfile: !!(p && p.name && p.goal),
+            hasAvatar: !!(p && p.avatar_url),
+            accountDays: accountAgeDays(created),
+            createdAt: created,
+          };
+        }
+
+        function evaluateAchievements(appState) {
+          var ctx = buildCtx(appState);
+          var unlocked = Object.assign({}, appState.achievements || {});
+          var newly = [];
+          BADGES.forEach(function (b) {
+            if (!unlocked[b.id] && b.check(ctx)) {
+              unlocked[b.id] = { at: new Date().toISOString() };
+              newly.push(b.id);
+            }
+          });
+          return { unlocked: unlocked, newly: newly, ctx: ctx };
+        }
+
+        function wibHourNow() {
+          var p = partsInTZ(new Date(), TZ);
+          return Number(p.hour);
+        }
+
+        function computeMonthlyReport(appState, monthNum) {
+          var created =
+            (appState.profile && appState.profile.created_at) ||
+            appState.metaCreatedAt;
+          var hist = (appState.progress && appState.progress.history) || {};
+          var start = created ? new Date(created) : new Date();
+          var from = new Date(start.getTime());
+          from.setMonth(from.getMonth() + (monthNum - 1));
+          var to = new Date(start.getTime());
+          to.setMonth(to.getMonth() + monthNum);
+          var commits = 0;
+          var reps = 0;
+          Object.keys(hist).forEach(function (k) {
+            var e = hist[k];
+            if (!e || !e.committed) return;
+            var d = new Date(k + "T12:00:00");
+            if (d >= from && d < to) {
+              commits += 1;
+              reps += e.total || (e.left || 0) + (e.right || 0);
+            }
+          });
+          var days = Math.max(
+            1,
+            Math.round((to - from) / (24 * 60 * 60 * 1000)),
+          );
+          var consist = Math.min(100, Math.round((commits / days) * 100));
+          var badgeNames = [];
+          var ach = appState.achievements || {};
+          BADGES.forEach(function (b) {
+            if (ach[b.id]) badgeNames.push(b.name);
+          });
+          return {
+            monthNum: monthNum,
+            commits: commits,
+            reps: reps,
+            bestStreak:
+              (appState.progress && appState.progress.bestStreak) || 0,
+            consist: consist,
+            badges: badgeNames,
+            from: from,
+            to: to,
+          };
+        }
+
+        var MIN = APP_CONFIG.MIN_REPS || 15;
+        function $(sel) {
+          return document.querySelector(sel);
+        }
+        function $$(sel) {
+          return Array.prototype.slice.call(document.querySelectorAll(sel));
+        }
+
+        var state = {
+          user: null,
+          profile: null,
+          progress: {
+            streak: 0,
+            bestStreak: 0,
+            lastCommitDate: null,
+            lifetimeReps: 0,
+            history: {},
+          },
+          reps: { left: 0, right: 0 },
+          camOn: false,
+          committing: false,
+          achievements: {},
+          seenAchievements: {},
+          monthlyReportsSeen: {},
+          metaCreatedAt: null,
+          earlyCommits: 0,
+          lateCommits: 0,
+          bilateralSessions: 0,
+          pfpDraft: null,
+        };
+
+        var tracker = null;
+        var midnightTimer = null;
+        var commitTimer = null;
+
+        function toast(msg) {
+          var el = $("#toast");
+          el.textContent = msg;
+          el.classList.add("show");
+          clearTimeout(toast._t);
+          toast._t = setTimeout(function () {
+            el.classList.remove("show");
+          }, 2600);
+        }
+
+        function showView(id) {
+          $$(".view").forEach(function (v) {
+            v.classList.toggle("active", v.id === id);
+          });
+        }
+
+        function bmi(weight, heightCm) {
+          var m = heightCm / 100;
+          if (!m) return "—";
+          return (weight / (m * m)).toFixed(1);
+        }
+
+        function goalLabel(g) {
+          var map = {
+            hypertrophy: "Hyper",
+            strength: "Strength",
+            consistency: "Consist",
+            rehab: "Rehab",
+            cut: "Cut",
+          };
+          return map[g] || "—";
+        }
+
+        function updateRepUI() {
+          $("#rep-left").textContent = String(state.reps.left);
+          $("#rep-right").textContent = String(state.reps.right);
+          $("#bar-left").style.width =
+            Math.min(100, (state.reps.left / MIN) * 100) + "%";
+          $("#bar-right").style.width =
+            Math.min(100, (state.reps.right / MIN) * 100) + "%";
+          var done =
+            state.reps.left >= MIN &&
+            state.reps.right >= MIN &&
+            !state.progress.committedToday;
+          $("#btn-commit").disabled = !done || state.committing;
+        }
+
+        function initials(name) {
+          if (!name) return "F";
+          var parts = String(name).trim().split(/\s+/);
+          var s = parts[0].charAt(0);
+          if (parts.length > 1) s += parts[1].charAt(0);
+          return s.toUpperCase();
+        }
+
+        function renderAvatar(url, name) {
+          var img = $("#avatar-img");
+          var fb = $("#avatar-fallback");
+          if (!img || !fb) return;
+          if (url) {
+            img.src = url;
+            img.hidden = false;
+            fb.hidden = true;
+          } else {
+            img.removeAttribute("src");
+            img.hidden = true;
+            fb.hidden = false;
+            fb.textContent = initials(name);
+          }
+        }
+
+        function renderPfpPreview(url, name) {
+          var box = $("#pfp-preview");
+          if (!box) return;
+          if (url) {
+            box.innerHTML =
+              '<img alt="" src="' + url.replace(/"/g, "&quot;") + '" />';
+          } else {
+            box.innerHTML =
+              '<div class="avatar-fallback">' + initials(name) + "</div>";
+          }
+        }
+
+        function renderAchievements(pulseIds) {
+          pulseIds = pulseIds || [];
+          var unlocked = state.achievements || {};
+          var seen = state.seenAchievements || {};
+          var count = Object.keys(unlocked).length;
+          var countEl = $("#achieve-count");
+          if (countEl) countEl.textContent = count + "/" + BADGES.length;
+          var rail = $("#badge-rail");
+          var nav = $("#bottom-achieve-nav");
+          if (rail) rail.innerHTML = "";
+          if (nav) nav.innerHTML = "";
+          BADGES.forEach(function (b) {
+            var isOn = !!unlocked[b.id];
+            var isNew = isOn && !seen[b.id];
+            if (rail) {
+              var btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "badge-item " + (isOn ? "unlocked" : "locked");
+              btn.setAttribute("data-badge", b.id);
+              var wrap = document.createElement("div");
+              wrap.className = "badge-svg-wrap" + (isNew ? " badge-new" : "");
+              wrap.innerHTML = b.svg(isOn);
+              var label = document.createElement("div");
+              label.className = "badge-name";
+              label.textContent = b.name;
+              btn.appendChild(wrap);
+              btn.appendChild(label);
+              btn.addEventListener("click", function () {
+                showBadgeDetail(b.id);
+              });
+              rail.appendChild(btn);
+            }
+            if (nav) {
+              var nbtn = document.createElement("button");
+              nbtn.type = "button";
+              nbtn.className = "nav-badge " + (isOn ? "unlocked" : "locked");
+              if (pulseIds.indexOf(b.id) !== -1) nbtn.classList.add("pulse");
+              nbtn.title = b.name;
+              nbtn.setAttribute("data-badge", b.id);
+              nbtn.innerHTML = b.svg(isOn);
+              nbtn.addEventListener("click", function () {
+                showBadgeDetail(b.id);
+              });
+              nav.appendChild(nbtn);
+            }
+          });
+        }
+
+        function showBadgeDetail(id) {
+          var b = null;
+          for (var i = 0; i < BADGES.length; i++)
+            if (BADGES[i].id === id) b = BADGES[i];
+          if (!b) return;
+          var on = !!(state.achievements && state.achievements[id]);
+          $("#badge-detail-icon").innerHTML = b.svg(on);
+          $("#badge-detail-title").textContent = b.name;
+          $("#badge-detail-desc").textContent = b.desc;
+          $("#badge-detail-status").textContent = on ? "UNLOCKED" : "LOCKED";
+          openModal("modal-badge");
+          if (on) {
+            state.seenAchievements = Object.assign(
+              {},
+              state.seenAchievements || {},
+            );
+            state.seenAchievements[id] = true;
+            persistMeta();
+            renderAchievements();
+          }
+        }
+
+        async function persistMeta() {
+          if (!state.user) return;
+          try {
+            await ForgeDB.saveMeta(state.user.id, {
+              achievements: state.achievements || {},
+              seenAchievements: state.seenAchievements || {},
+              monthlyReportsSeen: state.monthlyReportsSeen || {},
+              createdAt: state.metaCreatedAt,
+            });
+          } catch (e) {}
+        }
+
+        async function syncAchievements() {
+          var result = evaluateAchievements(state);
+          var prev = state.achievements || {};
+          state.achievements = result.unlocked;
+          var changed = result.newly.length > 0;
+          if (changed) {
+            await persistMeta();
+            renderAchievements(result.newly);
+            if (result.newly.length) {
+              var names = result.newly.map(function (id) {
+                for (var i = 0; i < BADGES.length; i++)
+                  if (BADGES[i].id === id) return BADGES[i].name;
+                return id;
+              });
+              toast("Achievement: " + names.join(", "));
+            }
+          } else {
+            renderAchievements();
+          }
+          return result;
+        }
+
+        function showMonthlyReport(monthNum) {
+          var rep = computeMonthlyReport(state, monthNum);
+          $("#report-title").textContent = "Month " + monthNum + " Report";
+          $("#report-sub").textContent =
+            "Sejak hari-H akunmu · siklus ke-" + monthNum;
+          $("#rp-commits").textContent = String(rep.commits);
+          $("#rp-reps").textContent = String(rep.reps);
+          $("#rp-streak").textContent = String(rep.bestStreak);
+          $("#rp-consist").textContent = rep.consist + "%";
+          var box = $("#rp-badges");
+          box.innerHTML = "";
+          if (!rep.badges.length) {
+            box.innerHTML = '<span class="chip">Belum ada badge</span>';
+          } else {
+            rep.badges.slice(0, 8).forEach(function (n) {
+              var s = document.createElement("span");
+              s.className = "chip";
+              s.textContent = n;
+              box.appendChild(s);
+            });
+          }
+          $("#report-note").textContent =
+            rep.commits >= 20
+              ? "Brutal consistency. Keep forcing."
+              : rep.commits >= 10
+                ? "Solid month. Naikkan frekuensi."
+                : "Bulan ini kurang garang. Jangan kasih kendor.";
+          openModal("modal-report");
+        }
+
+        async function maybeShowMonthlyReport() {
+          var created =
+            (state.profile && state.profile.created_at) || state.metaCreatedAt;
+          if (!created) return;
+          var due = anniversaryKeysDue(created, state.monthlyReportsSeen || {});
+          if (!due.length) return;
+          var first = due[0];
+          state.monthlyReportsSeen = Object.assign(
+            {},
+            state.monthlyReportsSeen || {},
+          );
+          state.monthlyReportsSeen[first.key] = true;
+          await persistMeta();
+          showMonthlyReport(first.month);
+        }
+
+        function updateStatsUI() {
+          var p = state.profile;
+          var pr = state.progress;
+          $("#streak-count").textContent = String(pr.streak || 0);
+          $("#stat-lifetime").textContent = String(pr.lifetimeReps || 0);
+          $("#stat-best").textContent = String(pr.bestStreak || 0);
+          $("#stat-goal").textContent = p ? goalLabel(p.goal) : "—";
+          $("#stat-bmi").textContent = p
+            ? bmi(Number(p.weight), Number(p.height))
+            : "—";
+          $("#hello-name").textContent = p && p.name ? "Hey, " + p.name : "Hey";
+          renderAvatar(p && p.avatar_url, p && p.name);
+          var chip = $("#btn-streak");
+          if ((pr.streak || 0) <= 0) chip.classList.add("dead");
+          else chip.classList.remove("dead");
+          var week = ForgeStreak.weekMap(pr.history || {});
+          var root = $("#week-days");
+          root.innerHTML = "";
+          week.forEach(function (d) {
+            var cell = document.createElement("div");
+            cell.className = "day-cell " + d.status;
+            if (
+              d.key === ForgeStreak.dateKey(new Date()) &&
+              d.status !== "done"
+            )
+              cell.classList.add("today");
+            cell.textContent = d.label;
+            cell.title = d.key;
+            root.appendChild(cell);
+          });
+          syncAchievements();
+        }
+
+        function openModal(id) {
+          var el = document.getElementById(id);
+          el.classList.add("open");
+          el.setAttribute("aria-hidden", "false");
+        }
+
+        function closeModal(id) {
+          var el = document.getElementById(id);
+          el.classList.remove("open");
+          el.setAttribute("aria-hidden", "true");
+        }
+
+        function showCommitModal() {
+          openModal("modal-commit");
+          var n = 5;
+          $("#commit-countdown").textContent = String(n);
+          $("#commit-sub").textContent =
+            "Streak " +
+            state.progress.streak +
+            " · " +
+            ForgeStreak.dateKey(new Date());
+          clearInterval(commitTimer);
+          commitTimer = setInterval(function () {
+            n -= 1;
+            $("#commit-countdown").textContent = String(n);
+            if (n <= 0) {
+              clearInterval(commitTimer);
+              closeModal("modal-commit");
+            }
+          }, 1000);
+        }
+
+        function renderStreakModal() {
+          $("#streak-modal-count").textContent =
+            (state.progress.streak || 0) + " Day Streak";
+          var cal = $("#streak-calendar");
+          cal.innerHTML = "";
+          ForgeStreak.weekMap(state.progress.history || {}).forEach(
+            function (d) {
+              var cell = document.createElement("div");
+              cell.className = "day-cell " + d.status;
+              if (d.key === ForgeStreak.dateKey(new Date()))
+                cell.classList.add("today");
+              cell.textContent = d.label;
+              cal.appendChild(cell);
+            },
+          );
+        }
+
+        async function refreshProgress() {
+          if (!state.user) return;
+          var raw = await ForgeDB.loadProgress(state.user.id);
+          var evaluated = ForgeStreak.evaluateStreak(raw);
+          state.progress = evaluated;
+          if (evaluated.changed)
+            await ForgeDB.saveProgress(state.user.id, evaluated);
+          updateStatsUI();
+          updateRepUI();
+        }
+
+        function scheduleMidnightWatch() {
+          clearTimeout(midnightTimer);
+          var ms = ForgeStreak.msUntilMidnightWIB() + 800;
+          midnightTimer = setTimeout(
+            async function () {
+              await refreshProgress();
+              if (!state.progress.committedToday)
+                toast("Streak dicek ulang · 00:00 WIB");
+              scheduleMidnightWatch();
+            },
+            Math.min(ms, 2147483647),
+          );
+        }
+
+        async function enterApp() {
+          if (!state.user) {
+            showView("view-login");
+            return;
+          }
+          var profile = await ForgeDB.loadProfile(state.user.id);
+          state.profile = profile;
+          try {
+            var meta = await ForgeDB.loadMeta(state.user.id);
+            state.achievements = meta.achievements || {};
+            state.seenAchievements = meta.seenAchievements || {};
+            state.monthlyReportsSeen = meta.monthlyReportsSeen || {};
+            state.metaCreatedAt =
+              meta.createdAt ||
+              (profile && profile.created_at) ||
+              state.metaCreatedAt;
+            var local = ForgeDB.readLocal() || ForgeDB.defaultState();
+            state.earlyCommits = local.earlyCommits || 0;
+            state.lateCommits = local.lateCommits || 0;
+            state.bilateralSessions = local.bilateralSessions || 0;
+          } catch (e) {}
+          if (!profile || !profile.name || !profile.goal) {
+            showView("view-onboard");
+            if (profile && profile.name) $("#pf-name").value = profile.name;
+            return;
+          }
+          if (!profile.created_at) {
+            profile.created_at =
+              state.metaCreatedAt || new Date().toISOString();
+            state.profile = profile;
+            state.metaCreatedAt = profile.created_at;
+            try {
+              await ForgeDB.saveProfile(state.user.id, profile);
+            } catch (e) {}
+          } else {
+            state.metaCreatedAt = profile.created_at;
+          }
+          await refreshProgress();
+          showView("view-workout");
+          scheduleMidnightWatch();
+          updateRepUI();
+          updateStatsUI();
+          setTimeout(function () {
+            maybeShowMonthlyReport();
+          }, 700);
+        }
+
+        function applyDemoVisibility() {
+          var btn = $("#btn-demo");
+          if (!btn) return;
+          if (ForgeDB.hasCloud) {
+            btn.classList.add("hidden-demo");
+            btn.setAttribute("hidden", "hidden");
+            btn.style.display = "none";
+          } else {
+            btn.classList.remove("hidden-demo");
+            btn.removeAttribute("hidden");
+            btn.style.display = "";
+          }
+        }
+
+        async function bootstrap() {
+          applyDemoVisibility();
+          try {
+            var session = await ForgeDB.getSession();
+            if (session && session.user && !session.demo) {
+              var u = session.user;
+              state.user = {
+                id: u.id,
+                email: u.email,
+                name:
+                  (u.user_metadata &&
+                    (u.user_metadata.full_name || u.user_metadata.name)) ||
+                  u.email ||
+                  "Athlete",
+                avatar: u.user_metadata && u.user_metadata.avatar_url,
+                provider: "google",
+              };
+            } else if (session && session.demo && !ForgeDB.hasCloud) {
+              state.user = session.user;
+            } else if (!ForgeDB.hasCloud) {
+              var local = ForgeDB.readLocal();
+              if (local && local.user && local.user.provider === "demo")
+                state.user = local.user;
+            }
+          } catch (e) {
+            toast("Auth error: " + e.message);
+          }
+          await enterApp();
+        }
+
+        function bindOnboard() {
+          $$(".seg-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              $$(".seg-btn").forEach(function (b) {
+                b.classList.remove("active");
+              });
+              btn.classList.add("active");
+              $("#pf-gender").value = btn.getAttribute("data-gender");
+              $("#onboard-progress").style.width = "55%";
+            });
+          });
+          var form = $("#form-profile");
+          form.addEventListener("input", function () {
+            var filled = [
+              "pf-name",
+              "pf-weight",
+              "pf-height",
+              "pf-age",
+              "pf-goal",
+            ].filter(function (id) {
+              var v = $("#" + id).value;
+              return v != null && String(v).trim() !== "";
+            }).length;
+            $("#onboard-progress").style.width =
+              Math.min(18 + filled * 14, 92) + "%";
+          });
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            if (!state.user) return;
+            var existing = state.profile || {};
+            var profile = {
+              name: $("#pf-name").value.trim(),
+              weight: Number($("#pf-weight").value),
+              height: Number($("#pf-height").value),
+              age: Number($("#pf-age").value),
+              gender: $("#pf-gender").value,
+              goal: $("#pf-goal").value,
+              avatar_url: existing.avatar_url || null,
+              created_at: existing.created_at || new Date().toISOString(),
+            };
+            state.metaCreatedAt = profile.created_at;
+            try {
+              $("#onboard-progress").style.width = "100%";
+              state.profile = await ForgeDB.saveProfile(state.user.id, profile);
+              toast("Protocol locked.");
+              await enterApp();
+            } catch (err) {
+              toast(err.message || "Gagal simpan profil");
+            }
+          });
+        }
+
+        function bindAuth() {
+          $("#btn-google").addEventListener("click", async function () {
+            try {
+              if (!ForgeDB.hasCloud) {
+                toast(
+                  "Isi SUPABASE_URL & SUPABASE_ANON_KEY di dalam file HTML ini",
+                );
+                return;
+              }
+              await ForgeDB.signInWithGoogle();
+            } catch (e) {
+              toast(e.message || "Google sign-in gagal");
+            }
+          });
+
+          $("#btn-demo").addEventListener("click", async function () {
+            try {
+              if (ForgeDB.hasCloud) {
+                toast("Demo Mode hilang — Supabase sudah connected");
+                applyDemoVisibility();
+                return;
+              }
+              state.user = await ForgeDB.signInDemo();
+              toast("Demo mode aktif");
+              await enterApp();
+            } catch (e) {
+              toast(e.message);
+            }
+          });
+
+          $("#btn-logout").addEventListener("click", async function () {
+            if (tracker) tracker.stop();
+            state.camOn = false;
+            $("#cam-placeholder").classList.remove("hidden");
+            await ForgeDB.signOut();
+            state.user = null;
+            state.profile = null;
+            state.reps = { left: 0, right: 0 };
+            showView("view-login");
+            applyDemoVisibility();
+            toast("Logged out");
+          });
+        }
+
+        function bindWorkout() {
+          $("#btn-start-cam").addEventListener("click", async function () {
+            try {
+              if (!tracker) {
+                tracker = ForgePose.createTracker({
+                  onRep: function (side, count) {
+                    state.reps[side] = count;
+                    updateRepUI();
+                    if (navigator.vibrate) navigator.vibrate(18);
+                  },
+                  onAngle: function (info) {
+                    var l = info.left != null ? Math.round(info.left) : "—";
+                    var r = info.right != null ? Math.round(info.right) : "—";
+                    var ls = info.leftStage === "up" ? "↑" : "↓";
+                    var rs = info.rightStage === "up" ? "↑" : "↓";
+                    $("#hud-angle").textContent =
+                      "L" + ls + l + "°  R" + rs + r + "°";
+                  },
+                  onStatus: function (s) {
+                    var hud = $("#hud-status");
+                    if (s === "live") {
+                      hud.textContent = "LIVE POSE";
+                      hud.classList.add("live");
+                    } else {
+                      hud.textContent = "STANDBY";
+                      hud.classList.remove("live");
+                    }
+                  },
+                });
+              }
+              await tracker.start($("#video"), $("#overlay"));
+              tracker.setCounts(state.reps.left, state.reps.right);
+              state.camOn = true;
+              $("#cam-placeholder").classList.add("hidden");
+              toast("Kamera aktif · angkat barbel");
+            } catch (e) {
+              toast(e.message || "Gagal akses kamera");
+            }
+          });
+
+          $("#btn-reset-reps").addEventListener("click", function () {
+            state.reps = { left: 0, right: 0 };
+            if (tracker) tracker.resetCounts();
+            updateRepUI();
+            toast("Reps di-reset");
+          });
+
+          $("#btn-commit").addEventListener("click", async function () {
+            if (state.reps.left < MIN || state.reps.right < MIN) return;
+            if (state.progress.committedToday) {
+              toast("Sudah commit hari ini");
+              return;
+            }
+            state.committing = true;
+            $("#btn-commit").disabled = true;
+            try {
+              var next = ForgeStreak.applyCommit(
+                state.progress,
+                state.reps.left,
+                state.reps.right,
+              );
+              state.progress = next;
+              if (state.reps.left >= MIN && state.reps.right >= MIN) {
+                state.bilateralSessions = (state.bilateralSessions || 0) + 1;
+              }
+              var hour = wibHourNow();
+              if (hour < 9) state.earlyCommits = (state.earlyCommits || 0) + 1;
+              if (hour >= 22) state.lateCommits = (state.lateCommits || 0) + 1;
+              var local = ForgeDB.readLocal() || ForgeDB.defaultState();
+              local.earlyCommits = state.earlyCommits;
+              local.lateCommits = state.lateCommits;
+              local.bilateralSessions = state.bilateralSessions;
+              ForgeDB.writeLocal(local);
+              await ForgeDB.saveProgress(state.user.id, next);
+              await ForgeDB.logWorkout(state.user.id, {
+                left: state.reps.left,
+                right: state.reps.right,
+                committed: true,
+                date: next.today,
+              });
+              updateStatsUI();
+              updateRepUI();
+              await syncAchievements();
+              showCommitModal();
+            } catch (e) {
+              toast(e.message || "Commit gagal");
+              $("#btn-commit").disabled = false;
+            } finally {
+              state.committing = false;
+            }
+          });
+
+          $("#btn-streak").addEventListener("click", function () {
+            renderStreakModal();
+            openModal("modal-streak");
+          });
+
+          $$("[data-close='streak']").forEach(function (el) {
+            el.addEventListener("click", function () {
+              closeModal("modal-streak");
+            });
+          });
+
+          function closeByAttr(name) {
+            $$("[data-close='" + name + "']").forEach(function (el) {
+              el.addEventListener("click", function () {
+                closeModal("modal-" + name);
+              });
+            });
+          }
+          closeByAttr("pfp");
+          closeByAttr("report");
+          closeByAttr("badge");
+
+          var reportClose = $("#btn-report-close");
+          if (reportClose)
+            reportClose.addEventListener("click", function () {
+              closeModal("modal-report");
+            });
+
+          var btnAvatar = $("#btn-avatar");
+          var pfpFile = $("#pfp-file");
+          if (btnAvatar && pfpFile) {
+            btnAvatar.addEventListener("click", function () {
+              state.pfpDraft =
+                (state.profile && state.profile.avatar_url) || null;
+              renderPfpPreview(
+                state.pfpDraft,
+                state.profile && state.profile.name,
+              );
+              openModal("modal-pfp");
+            });
+            $("#btn-pfp-pick").addEventListener("click", function () {
+              pfpFile.click();
+            });
+            pfpFile.addEventListener("change", function () {
+              var file = pfpFile.files && pfpFile.files[0];
+              if (!file) return;
+              if (file.size > 1.6 * 1024 * 1024) {
+                toast("Max 1.5MB");
+                pfpFile.value = "";
+                return;
+              }
+              var reader = new FileReader();
+              reader.onload = function () {
+                var data = String(reader.result || "");
+                var img = new Image();
+                img.onload = function () {
+                  var max = 256;
+                  var w = img.width;
+                  var h = img.height;
+                  var scale = Math.min(1, max / Math.max(w, h));
+                  var cw = Math.max(1, Math.round(w * scale));
+                  var ch = Math.max(1, Math.round(h * scale));
+                  var c = document.createElement("canvas");
+                  c.width = cw;
+                  c.height = ch;
+                  var cx = c.getContext("2d");
+                  cx.drawImage(img, 0, 0, cw, ch);
+                  state.pfpDraft = c.toDataURL("image/jpeg", 0.85);
+                  renderPfpPreview(
+                    state.pfpDraft,
+                    state.profile && state.profile.name,
+                  );
+                };
+                img.src = data;
+              };
+              reader.readAsDataURL(file);
+              pfpFile.value = "";
+            });
+            $("#btn-pfp-remove").addEventListener("click", function () {
+              state.pfpDraft = null;
+              renderPfpPreview(null, state.profile && state.profile.name);
+            });
+            $("#btn-pfp-save").addEventListener("click", async function () {
+              if (!state.user || !state.profile) {
+                toast("Profil belum siap");
+                return;
+              }
+              try {
+                var profile = Object.assign({}, state.profile, {
+                  avatar_url: state.pfpDraft,
+                });
+                state.profile = await ForgeDB.saveProfile(
+                  state.user.id,
+                  profile,
+                );
+                renderAvatar(state.profile.avatar_url, state.profile.name);
+                closeModal("modal-pfp");
+                toast("PFP updated");
+                await syncAchievements();
+              } catch (e) {
+                toast(e.message || "Gagal simpan PFP");
+              }
+            });
+          }
+        }
+
+        if (ForgeDB.client) {
+          ForgeDB.client.auth.onAuthStateChange(
+            async function (event, session) {
+              if (event === "SIGNED_IN" && session && session.user) {
+                var u = session.user;
+                state.user = {
+                  id: u.id,
+                  email: u.email,
+                  name:
+                    (u.user_metadata &&
+                      (u.user_metadata.full_name || u.user_metadata.name)) ||
+                    u.email ||
+                    "Athlete",
+                  avatar: u.user_metadata && u.user_metadata.avatar_url,
+                  provider: "google",
+                };
+                var local = ForgeDB.readLocal() || ForgeDB.defaultState();
+                local.user = state.user;
+                ForgeDB.writeLocal(local);
+                await enterApp();
+              }
+              if (event === "SIGNED_OUT") {
+                state.user = null;
+                showView("view-login");
+                applyDemoVisibility();
+              }
+            },
+          );
+        }
+
+        bindAuth();
+        bindOnboard();
+        bindWorkout();
+        bootstrap();
+      })();
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b =
+            a.contentDocument || (a.contentWindow && a.contentWindow.document);
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'a3de7ebfff45c3c2',t:'MTc4OTg4MjgyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
