@@ -1320,6 +1320,159 @@
         background: linear-gradient(90deg, var(--orange), var(--yellow));
         transition: width 0.35s var(--ease);
       }
+
+      .achieve-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .achieve-filter {
+        min-height: 38px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+      .achieve-filter:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+      .achieve-filter.active {
+        background: #fff;
+        border-color: #fff;
+        color: #000;
+      }
+      .badge-date {
+        font-family: var(--mono);
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--orange);
+        line-height: 1.2;
+      }
+      .badge-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+        padding: 22px 8px;
+      }
+      .badge-progress {
+        margin: 14px 0 4px;
+      }
+      .badge-progress-track {
+        height: 8px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+      .badge-progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--red), var(--orange));
+        transition: width 0.35s var(--ease);
+      }
+      .badge-progress-text {
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+      .unlock-card {
+        border: 3px solid #fff;
+        box-shadow:
+          10px 10px 0 var(--yellow),
+          var(--shadow);
+        overflow: hidden;
+      }
+      .unlock-eyebrow {
+        color: var(--yellow);
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+      .unlock-card h2 {
+        font-size: 28px;
+        letter-spacing: -0.03em;
+        margin-bottom: 6px;
+      }
+      .unlock-icon {
+        display: grid;
+        place-items: center;
+        margin: 14px auto 12px;
+        animation: unlockPop 0.6s var(--ease);
+      }
+      .unlock-icon svg {
+        width: 108px;
+        height: 108px;
+        filter: drop-shadow(0 0 18px rgba(255, 159, 10, 0.45));
+      }
+      .unlock-rail {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 14px 0 6px;
+        animation: unlockPop 0.6s var(--ease);
+      }
+      .unlock-pick {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 149, 0, 0.45);
+        background: rgba(255, 149, 0, 0.1);
+        display: grid;
+        place-items: center;
+        padding: 6px;
+        transition: transform 0.2s var(--ease);
+      }
+      .unlock-pick svg {
+        width: 44px;
+        height: 44px;
+      }
+      .unlock-pick:hover {
+        transform: translateY(-2px);
+      }
+      .unlock-date {
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--orange);
+      }
+      .unlock-more {
+        margin-top: 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+      .unlock-hide {
+        display: none !important;
+      }
+      @keyframes unlockPop {
+        0% {
+          opacity: 0;
+          transform: scale(0.82) rotate(-4deg);
+        }
+        60% {
+          opacity: 1;
+          transform: scale(1.06) rotate(1deg);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
       .goal-chip-label {
         font-family: var(--mono);
         font-weight: 800;
@@ -2125,6 +2278,38 @@
       </div>
     </div>
 
+    <div id="modal-unlock" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="unlock"></div>
+      <div class="modal-card unlock-card">
+        <button class="modal-x" data-close="unlock" type="button">×</button>
+        <p class="unlock-eyebrow" id="unlock-eyebrow">
+          ACHIEVEMENT UNLOCKED
+        </p>
+        <h2 id="unlock-title">Badge</h2>
+        <div class="unlock-icon" id="unlock-icon"></div>
+        <div class="unlock-rail unlock-hide" id="unlock-rail"></div>
+        <p class="muted" id="unlock-desc"></p>
+        <p class="unlock-date" id="unlock-date"></p>
+        <div class="unlock-more unlock-hide" id="unlock-more"></div>
+        <button
+          id="btn-unlock-collection"
+          class="btn btn-primary btn-block"
+          type="button"
+          style="margin-top: 18px"
+        >
+          LIHAT KOLEKSI
+        </button>
+        <button
+          id="btn-unlock-close"
+          class="btn btn-brutal btn-block"
+          type="button"
+          style="margin-top: 10px"
+        >
+          LANJUT
+        </button>
+      </div>
+    </div>
+
     <div id="modal-achieve" class="modal" aria-hidden="true">
       <div class="modal-backdrop" data-close="achieve"></div>
       <div class="modal-card achieve-card">
@@ -2136,6 +2321,22 @@
         </p>
         <div class="achieve-progress">
           <div class="fill" id="achieve-bar"></div>
+        </div>
+        <div id="achieve-filters" class="achieve-filters" role="group" aria-label="Filter badge">
+          <button
+            class="achieve-filter active"
+            type="button"
+            data-filter="all"
+          >
+            SEMUA
+          </button>
+          <button
+            class="achieve-filter"
+            type="button"
+            data-filter="unlocked"
+          >
+            TERAIH <span id="achieve-filter-count">0</span>
+          </button>
         </div>
         <div id="badge-rail" class="badge-rail"></div>
         <button
@@ -2231,6 +2432,21 @@
         >
           LOCKED
         </p>
+        <div id="badge-detail-progress" class="badge-progress">
+          <div class="badge-progress-track">
+            <div class="badge-progress-fill" id="badge-progress-fill"></div>
+          </div>
+          <p class="badge-progress-text" id="badge-progress-text">
+            PROGRESS 0 / 1
+          </p>
+        </div>
+        <button
+          id="btn-badge-replay"
+          class="btn btn-brutal btn-block unlock-hide"
+          type="button"
+        >
+          PUTAR LAGI
+        </button>
       </div>
     </div>
 
@@ -2241,8 +2457,8 @@
         "use strict";
 
         var APP_CONFIG = {
-          SUPABASE_URL: "https://cnghoruhqqrqkeogprbz.supabase.co",
-          SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuZ2hvcnVocXFycWtlb2dwcmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4Mzk3MDUsImV4cCI6MjEwNTQxNTcwNX0.KlcGL7G34AnDVb8Ju6HRLpbt4JCj9QVLYfSTIqwJt6Q",
+          SUPABASE_URL: "https://YOUR_PROJECT_REF.supabase.co",
+          SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY",
           MIN_REPS: 15,
           DEFAULT_GOAL_REPS: 15,
           STREAK_TZ: "Asia/Jakarta",
@@ -2344,8 +2560,7 @@
             key: key,
             id: user.id || prev.id || null,
             email: user.email || prev.email || null,
-            name:
-              (profile && profile.name) || user.name || prev.name || "Athlete",
+            name: (profile && profile.name) || user.name || prev.name || "Athlete",
             avatar:
               (profile && profile.avatar_url) ||
               user.avatar ||
@@ -2694,9 +2909,7 @@
               acc.provider === "google" &&
               (!state.user || state.user.id !== acc.id)
             )
-              throw new Error(
-                "Akun Google perlu login ulang lewat tombol Google.",
-              );
+              throw new Error("Akun Google perlu login ulang lewat tombol Google.");
             if (state.user && accountKey(state.user) !== key)
               stashAccount(reg, state.user, liveSnapshot());
             var snap = acc.snapshot
@@ -2720,8 +2933,7 @@
               provider: prevUser.provider || acc.provider || "google",
             });
             snap.user = user;
-            if (!snap.goalReps)
-              snap.goalReps = APP_CONFIG.DEFAULT_GOAL_REPS || 15;
+            if (!snap.goalReps) snap.goalReps = APP_CONFIG.DEFAULT_GOAL_REPS || 15;
             writeLocal(snap);
             reg = readAccounts();
             reg.activeId = key;
@@ -3495,6 +3707,85 @@
           },
         ];
 
+        var BADGE_PROGRESS = {
+          first_fire: function (c) {
+            return { have: c.totalCommits, need: 1, unit: "commit" };
+          },
+          iron_week: function (c) {
+            return { have: Math.max(c.bestStreak, c.streak), need: 7, unit: "hari" };
+          },
+          rep_machine: function (c) {
+            return { have: c.lifetimeReps, need: 500, unit: "reps" };
+          },
+          bilateral: function (c) {
+            return { have: c.bilateralSessions, need: 1, unit: "sesi" };
+          },
+          no_escape: function (c) {
+            return { have: Math.max(c.bestStreak, c.streak), need: 30, unit: "hari" };
+          },
+          early_forge: function (c) {
+            return { have: c.earlyCommits, need: 1, unit: "commit" };
+          },
+          midnight_oil: function (c) {
+            return { have: c.lateCommits, need: 1, unit: "commit" };
+          },
+          ton_club: function (c) {
+            return { have: c.lifetimeReps, need: 1000, unit: "reps" };
+          },
+          profile_locked: function (c) {
+            return {
+              have: (c.hasProfile ? 1 : 0) + (c.hasAvatar ? 1 : 0),
+              need: 2,
+              unit: "langkah",
+            };
+          },
+          month_one: function (c) {
+            return { have: c.accountDays, need: 30, unit: "hari" };
+          },
+        };
+
+        function badgeById(id) {
+          for (var i = 0; i < BADGES.length; i++)
+            if (BADGES[i].id === id) return BADGES[i];
+          return null;
+        }
+
+        function computeBadgeProgress(id, ctx) {
+          var fn = BADGE_PROGRESS[id];
+          var have = 0;
+          var need = 1;
+          var unit = "";
+          if (fn) {
+            var r = fn(ctx || {}) || {};
+            if (r.have != null && isFinite(r.have)) have = Math.max(0, Math.floor(r.have));
+            if (r.need) need = r.need;
+            unit = r.unit || "";
+          }
+          var pct = need > 0 ? Math.min(100, Math.round((have / need) * 100)) : 0;
+          return {
+            have: Math.min(have, need),
+            need: need,
+            pct: pct,
+            unit: unit,
+          };
+        }
+
+        function formatUnlockDate(iso) {
+          var d = iso ? new Date(iso) : new Date();
+          if (!d || isNaN(d.getTime())) d = new Date();
+          try {
+            return new Intl.DateTimeFormat("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+              .format(d)
+              .toUpperCase();
+          } catch (e) {
+            return d.toISOString().slice(0, 10);
+          }
+        }
+
         function accountAgeDays(createdAt) {
           if (!createdAt) return 0;
           var t = new Date(createdAt).getTime();
@@ -3764,6 +4055,9 @@
         var tracker = null;
         var midnightTimer = null;
         var commitTimer = null;
+        var badgeFilter = "all";
+        var unlockQueue = [];
+        var unlockPumpTimer = null;
 
         function toast(msg) {
           var el = $("#toast");
@@ -3851,6 +4145,90 @@
           }
         }
 
+        function markSeen(ids) {
+          state.seenAchievements = Object.assign(
+            {},
+            state.seenAchievements || {},
+          );
+          ids.forEach(function (id) {
+            state.seenAchievements[id] = true;
+          });
+          persistMeta();
+          renderAchievements();
+        }
+
+        function anyModalOpen() {
+          return !!document.querySelector(".modal.open");
+        }
+
+        function queueUnlock(ids) {
+          ids.forEach(function (id) {
+            if (unlockQueue.indexOf(id) === -1) unlockQueue.push(id);
+          });
+          clearTimeout(unlockPumpTimer);
+          unlockPumpTimer = setTimeout(pumpUnlock, 400);
+        }
+
+        function pumpUnlock() {
+          if (!unlockQueue.length) return;
+          if (anyModalOpen()) {
+            unlockPumpTimer = setTimeout(pumpUnlock, 700);
+            return;
+          }
+          var ids = unlockQueue.slice();
+          unlockQueue = [];
+          showUnlockModal(ids);
+        }
+
+        function showUnlockModal(ids) {
+          if (!ids || !ids.length) return;
+          var list = [];
+          ids.forEach(function (id) {
+            var b = badgeById(id);
+            if (b) list.push(b);
+          });
+          if (!list.length) return;
+          var iconEl = $("#unlock-icon");
+          var railEl = $("#unlock-rail");
+          var eyebrow = $("#unlock-eyebrow");
+          var title = $("#unlock-title");
+          var desc = $("#unlock-desc");
+          var dateEl = $("#unlock-date");
+          var moreEl = $("#unlock-more");
+          if (!iconEl || !railEl || !title) return;
+          iconEl.innerHTML = "";
+          railEl.innerHTML = "";
+          var first = list[0];
+          var rec = (state.achievements && state.achievements[first.id]) || {};
+          var many = list.length > 1;
+          eyebrow.textContent = "ACHIEVEMENT UNLOCKED";
+          title.textContent = many ? list.length + " BADGE BARU" : first.name;
+          iconEl.classList.toggle("unlock-hide", many);
+          railEl.classList.toggle("unlock-hide", !many);
+          dateEl.classList.toggle("unlock-hide", many);
+          moreEl.classList.toggle("unlock-hide", !many);
+          if (many) {
+            desc.textContent = "Ketuk badge buat lihat detailnya.";
+            moreEl.textContent =
+              "Semua sudah masuk koleksi. Buka tab TERAIH di Achievement Vault kalau mau lihat lagi kapan pun.";
+            list.forEach(function (b) {
+              var btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "unlock-pick";
+              btn.setAttribute("data-badge-open", b.id);
+              btn.title = b.name;
+              btn.innerHTML = b.svg(true);
+              railEl.appendChild(btn);
+            });
+          } else {
+            desc.textContent = first.desc;
+            dateEl.textContent = "TERAIH " + formatUnlockDate(rec.at);
+            iconEl.innerHTML = first.svg(true);
+          }
+          openModal("modal-unlock");
+          markSeen(ids);
+        }
+
         function renderAchievements(pulseIds) {
           pulseIds = pulseIds || [];
           var unlocked = state.achievements || {};
@@ -3878,11 +4256,40 @@
               ".";
           var chip = $("#btn-achievements");
           if (chip) chip.classList.toggle("has-new", hasNew);
+          var filterCount = $("#achieve-filter-count");
+          if (filterCount) filterCount.textContent = String(count);
+          $$("#achieve-filters .achieve-filter").forEach(function (f) {
+            f.classList.toggle(
+              "active",
+              f.getAttribute("data-filter") === badgeFilter,
+            );
+          });
+          var grid;
+          if (badgeFilter === "unlocked") {
+            grid = BADGES.filter(function (b) {
+              return !!unlocked[b.id];
+            }).sort(function (a, b) {
+              var ta = (unlocked[a.id] && unlocked[a.id].at) || "";
+              var tb = (unlocked[b.id] && unlocked[b.id].at) || "";
+              if (tb < ta) return -1;
+              if (tb > ta) return 1;
+              return 0;
+            });
+          } else {
+            grid = BADGES.slice();
+          }
           var rail = $("#badge-rail");
           var nav = $("#bottom-achieve-nav");
           if (rail) rail.innerHTML = "";
           if (nav) nav.innerHTML = "";
-          BADGES.forEach(function (b) {
+          if (rail && !grid.length) {
+            var empty = document.createElement("div");
+            empty.className = "badge-empty";
+            empty.textContent =
+              "Belum ada badge teraih. Commit harianmu buat buka yang pertama.";
+            rail.appendChild(empty);
+          }
+          grid.forEach(function (b) {
             var isOn = !!unlocked[b.id];
             var isNew = isOn && !seen[b.id];
             if (rail) {
@@ -3898,6 +4305,12 @@
               label.textContent = b.name;
               btn.appendChild(wrap);
               btn.appendChild(label);
+              if (badgeFilter === "unlocked" && unlocked[b.id]) {
+                var stamp = document.createElement("div");
+                stamp.className = "badge-date";
+                stamp.textContent = formatUnlockDate(unlocked[b.id].at);
+                btn.appendChild(stamp);
+              }
               btn.addEventListener("click", function () {
                 showBadgeDetail(b.id);
               });
@@ -3920,25 +4333,36 @@
         }
 
         function showBadgeDetail(id) {
-          var b = null;
-          for (var i = 0; i < BADGES.length; i++)
-            if (BADGES[i].id === id) b = BADGES[i];
+          var b = badgeById(id);
           if (!b) return;
-          var on = !!(state.achievements && state.achievements[id]);
+          var rec = (state.achievements && state.achievements[id]) || null;
+          var on = !!rec;
           $("#badge-detail-icon").innerHTML = b.svg(on);
           $("#badge-detail-title").textContent = b.name;
           $("#badge-detail-desc").textContent = b.desc;
-          $("#badge-detail-status").textContent = on ? "UNLOCKED" : "LOCKED";
-          openModal("modal-badge");
-          if (on) {
-            state.seenAchievements = Object.assign(
-              {},
-              state.seenAchievements || {},
-            );
-            state.seenAchievements[id] = true;
-            persistMeta();
-            renderAchievements();
+          $("#badge-detail-status").textContent = on
+            ? "UNLOCKED · " + formatUnlockDate(rec.at)
+            : "LOCKED";
+          var replay = $("#btn-badge-replay");
+          if (replay) {
+            replay.setAttribute("data-badge-id", b.id);
+            replay.classList.toggle("unlock-hide", !on);
           }
+          var progBox = $("#badge-detail-progress");
+          if (progBox) {
+            progBox.classList.toggle("unlock-hide", on);
+            if (!on) {
+              var info = computeBadgeProgress(id, buildCtx(state));
+              var fill = $("#badge-progress-fill");
+              var text = $("#badge-progress-text");
+              if (fill) fill.style.width = info.pct + "%";
+              if (text)
+                text.textContent =
+                  "PROGRESS " + info.have + " / " + info.need + " " + info.unit;
+            }
+          }
+          openModal("modal-badge");
+          if (on) markSeen([id]);
         }
 
         async function persistMeta() {
@@ -3961,14 +4385,7 @@
           if (changed) {
             await persistMeta();
             renderAchievements(result.newly);
-            if (result.newly.length) {
-              var names = result.newly.map(function (id) {
-                for (var i = 0; i < BADGES.length; i++)
-                  if (BADGES[i].id === id) return BADGES[i].name;
-                return id;
-              });
-              toast("Achievement: " + names.join(", "));
-            }
+            if (result.newly.length) queueUnlock(result.newly);
           } else {
             renderAchievements();
           }
@@ -4322,10 +4739,12 @@
 
         function accountAvatarHtml(acc) {
           if (acc.avatar)
-            return '<img alt="" src="' + escapeHtml(acc.avatar) + '" />';
-          return (
-            '<span class="account-ini">' + accountInitials(acc) + "</span>"
-          );
+            return (
+              '<img alt="" src="' +
+              escapeHtml(acc.avatar) +
+              '" />'
+            );
+          return '<span class="account-ini">' + accountInitials(acc) + "</span>";
         }
 
         function accountSubLabel(acc) {
@@ -4588,8 +5007,8 @@
               });
               updateStatsUI();
               updateRepUI();
-              await syncAchievements();
               showCommitModal();
+              await syncAchievements();
             } catch (e) {
               toast(e.message || "Commit gagal");
               $("#btn-commit").disabled = false;
@@ -4616,6 +5035,43 @@
               closeModal("modal-achieve");
             });
 
+          var achieveFilters = $("#achieve-filters");
+          if (achieveFilters)
+            achieveFilters.addEventListener("click", function (e) {
+              var f = closestData(e.target, "data-filter");
+              if (!f) return;
+              badgeFilter = f;
+              renderAchievements();
+            });
+
+          var unlockCard = $("#modal-unlock");
+          if (unlockCard)
+            unlockCard.addEventListener("click", function (e) {
+              var target = closestData(e.target, "data-badge-open");
+              if (target) showBadgeDetail(target);
+            });
+
+          var unlockClose = $("#btn-unlock-close");
+          if (unlockClose)
+            unlockClose.addEventListener("click", function () {
+              closeModal("modal-unlock");
+            });
+
+          var unlockCollection = $("#btn-unlock-collection");
+          if (unlockCollection)
+            unlockCollection.addEventListener("click", function () {
+              badgeFilter = "all";
+              renderAchievements();
+              openModal("modal-achieve");
+            });
+
+          var badgeReplay = $("#btn-badge-replay");
+          if (badgeReplay)
+            badgeReplay.addEventListener("click", function () {
+              var rid = badgeReplay.getAttribute("data-badge-id");
+              if (rid) showUnlockModal([rid]);
+            });
+
           var goalOpen = $("#btn-goal");
           if (goalOpen)
             goalOpen.addEventListener("click", function () {
@@ -4639,7 +5095,8 @@
             goalInput.addEventListener("input", function () {
               var clean = goalInput.value.replace(/[^0-9]/g, "");
               if (clean !== goalInput.value) goalInput.value = clean;
-              if (clean !== "") updateGoalDraftUI(normalizeGoal(Number(clean)));
+              if (clean !== "")
+                updateGoalDraftUI(normalizeGoal(Number(clean)));
             });
             goalInput.addEventListener("blur", function () {
               setGoalDraft(goalInput.value);
@@ -4686,6 +5143,7 @@
           closeByAttr("badge");
           closeByAttr("achieve");
           closeByAttr("goal");
+          closeByAttr("unlock");
 
           var reportClose = $("#btn-report-close");
           if (reportClose)
@@ -4844,41 +5302,5 @@
         }
       })();
     </script>
-    <script>
-      (function () {
-        function c() {
-          var b =
-            a.contentDocument || (a.contentWindow && a.contentWindow.document);
-          if (b) {
-            var d = b.createElement("script");
-            d.innerHTML =
-              "window.__CF$cv$params={r:'a3e58854ce3bfe1f',t:'MTc4OTk1NjYxNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-            b.getElementsByTagName("head")[0].appendChild(d);
-          }
-        }
-        if (document.body) {
-          var a = document.createElement("iframe");
-          a.height = 1;
-          a.width = 1;
-          a.style.position = "absolute";
-          a.style.top = 0;
-          a.style.left = 0;
-          a.style.border = "none";
-          a.style.visibility = "hidden";
-          document.body.appendChild(a);
-          if ("loading" !== document.readyState) c();
-          else if (window.addEventListener)
-            document.addEventListener("DOMContentLoaded", c);
-          else {
-            var e = document.onreadystatechange || function () {};
-            document.onreadystatechange = function (b) {
-              e(b);
-              "loading" !== document.readyState &&
-                ((document.onreadystatechange = e), c());
-            };
-          }
-        }
-      })();
-    </script>
-  </body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e5ac81fd9b9fdd',t:'MTc4OTk1ODA5OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
