@@ -12,7 +12,7 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <title>FORGE — Forced Strength</title>
+    <title>FORGE</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0A0A'/%3E%3Crect x='4' y='4' width='56' height='56' rx='12' fill='%23FF3B30'/%3E%3Cpath d='M18 40 L28 18 L38 40 Z' fill='%23fff'/%3E%3Crect x='30' y='24' width='16' height='7' rx='2' fill='%23fff'/%3E%3Ccircle cx='48' cy='27.5' r='5' fill='%23FFD60A'/%3E%3C/svg%3E"
@@ -1258,6 +1258,296 @@
       .modal-card.center-text {
         text-align: center;
       }
+
+      .achieve-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 40px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: rgba(255, 214, 10, 0.1);
+        border: 1px solid rgba(255, 214, 10, 0.3);
+        color: var(--yellow);
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .achieve-chip:hover {
+        background: rgba(255, 214, 10, 0.18);
+      }
+      .achieve-chip.has-new {
+        animation: badgePop 1.1s var(--ease) 3;
+        border-color: rgba(255, 214, 10, 0.6);
+        background: rgba(255, 214, 10, 0.16);
+      }
+      .achieve-chip svg {
+        width: 18px;
+        height: 18px;
+      }
+      .achieve-card {
+        text-align: left;
+        width: min(560px, calc(100% - 32px));
+        border: 3px solid #fff;
+        box-shadow:
+          10px 10px 0 var(--yellow),
+          var(--shadow);
+        max-height: 88dvh;
+        overflow-y: auto;
+      }
+      .achieve-card h2 {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+        margin: 6px 0 4px;
+      }
+      @media (max-width: 520px) {
+        #modal-achieve .badge-rail {
+          grid-template-columns: repeat(4, 1fr);
+          overflow-x: visible;
+        }
+      }
+      .achieve-progress {
+        height: 8px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        margin: 16px 0 18px;
+      }
+      .achieve-progress .fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--orange), var(--yellow));
+        transition: width 0.35s var(--ease);
+      }
+      .goal-chip-label {
+        font-family: var(--mono);
+        font-weight: 800;
+        color: var(--yellow);
+      }
+      .goal-card {
+        text-align: left;
+      }
+      .goal-card h2 {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+        margin: 6px 0 4px;
+      }
+      .goal-value-row {
+        display: grid;
+        grid-template-columns: 56px 1fr 56px;
+        gap: 10px;
+        align-items: center;
+        margin: 18px 0 12px;
+      }
+      .goal-step {
+        height: 56px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.06);
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text);
+      }
+      .goal-step:hover {
+        background: rgba(255, 255, 255, 0.14);
+      }
+      .goal-input {
+        height: 56px;
+        width: 100%;
+        text-align: center;
+        border-radius: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        background: #0f0f10;
+        color: var(--text);
+        font-size: 26px;
+        font-weight: 900;
+        font-family: var(--mono);
+      }
+      .goal-input:focus {
+        outline: none;
+        border-color: var(--yellow);
+      }
+      .goal-presets {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .goal-preset {
+        min-height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-weight: 800;
+        font-family: var(--mono);
+      }
+      .goal-preset:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+      .goal-preset.active {
+        background: var(--yellow);
+        border-color: var(--yellow);
+        color: #000;
+      }
+      .goal-hint {
+        margin: 14px 0 16px;
+        text-align: center;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--orange);
+      }
+      .stat-sub {
+        margin-top: 4px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+      }
+      .login-accounts {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+      .login-accounts-title {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .account-list {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 10px;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      .account-row {
+        display: grid;
+        grid-template-columns: 1fr 38px;
+        align-items: center;
+        gap: 4px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 6px 6px 6px 8px;
+      }
+      .account-row.active {
+        border-color: rgba(255, 149, 0, 0.45);
+        background: rgba(255, 149, 0, 0.08);
+      }
+      .account-pick {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        padding: 6px 4px;
+        border-radius: 12px;
+        min-width: 0;
+      }
+      .account-pick:hover {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .account-av {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #ff3b30, #ff9f0a);
+        color: #fff;
+        font-weight: 800;
+        font-size: 14px;
+      }
+      .account-av img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .account-meta {
+        display: grid;
+        min-width: 0;
+      }
+      .account-name {
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .account-sub {
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .account-tag {
+        margin-left: auto;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        color: var(--orange);
+        border: 1px solid rgba(255, 149, 0, 0.35);
+        border-radius: 999px;
+        padding: 3px 7px;
+        flex-shrink: 0;
+      }
+      .account-del {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: var(--muted);
+        font-size: 20px;
+        line-height: 1;
+      }
+      .account-del:hover {
+        background: rgba(255, 59, 48, 0.16);
+        color: var(--red);
+      }
+      .action-row {
+        grid-template-columns: 1fr 1fr 1.6fr;
+      }
+      @media (max-width: 620px) {
+        .action-row {
+          grid-template-columns: 1fr 1fr;
+        }
+        .action-row #btn-commit {
+          grid-column: 1 / -1;
+        }
+      }
+      .workout-main .bottom-achieve-nav {
+        margin: 8px -16px -24px;
+      }
+      @media (max-width: 430px) {
+        .topbar {
+          padding: 12px;
+          gap: 8px;
+        }
+        .topbar-left,
+        .topbar-right {
+          gap: 8px;
+        }
+        .topbar .subhello,
+        .topbar .mini-mark {
+          display: none;
+        }
+        .achieve-chip {
+          padding: 0 10px;
+          gap: 5px;
+        }
+        .hello {
+          font-size: 14px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1324,6 +1614,17 @@
             <button id="btn-demo" class="btn btn-ghost" type="button">
               Demo Mode (tanpa OAuth)
             </button>
+            <div id="login-accounts-wrap" class="login-accounts" hidden>
+              <p class="login-accounts-title">GANTI AKUN</p>
+              <div id="login-accounts" class="account-list"></div>
+              <button
+                id="btn-account-add"
+                class="btn btn-ghost btn-block"
+                type="button"
+              >
+                + Tambah akun lain
+              </button>
+            </div>
             <p class="fine-print">
               Dengan masuk, kamu setuju dipaksa lift setiap hari. Tidak ada skip
               button.
@@ -1475,6 +1776,32 @@
           </div>
           <div class="topbar-right">
             <button
+              id="btn-achievements"
+              class="achieve-chip"
+              type="button"
+              title="Achievements"
+              aria-label="Achievements"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 4h10v5a5 5 0 0 1-10 0z" />
+                <path d="M17 5h3v2a3 3 0 0 1-3 3" />
+                <path d="M7 5H4v2a3 3 0 0 0 3 3" />
+                <path d="M12 14v4" />
+                <path d="M8 21h8" />
+              </svg>
+              <span id="achieve-count">0/10</span>
+            </button>
+            <button
               id="btn-streak"
               class="streak-chip"
               type="button"
@@ -1531,7 +1858,7 @@
         <main class="workout-main">
           <div class="mandate-banner">
             <span class="pulse-dot"></span>
-            <span
+            <span id="mandate-text"
               >MINIMUM HARI INI: <strong>15 KIRI</strong> ·
               <strong>15 KANAN</strong></span
             >
@@ -1583,7 +1910,7 @@
               <div class="rep-bar">
                 <div id="bar-left" class="rep-bar-fill"></div>
               </div>
-              <p class="rep-target">/ 15</p>
+              <p class="rep-target" id="rep-target-left">/ 15</p>
             </div>
             <div class="rep-card right-card">
               <p class="rep-label">KANAN</p>
@@ -1591,13 +1918,22 @@
               <div class="rep-bar">
                 <div id="bar-right" class="rep-bar-fill"></div>
               </div>
-              <p class="rep-target">/ 15</p>
+              <p class="rep-target" id="rep-target-right">/ 15</p>
             </div>
           </div>
 
           <div class="action-row">
             <button id="btn-reset-reps" class="btn btn-ghost" type="button">
               Reset Reps
+            </button>
+            <button
+              id="btn-goal"
+              class="btn btn-ghost"
+              type="button"
+              title="Atur goal reps"
+            >
+              Goal
+              <span id="goal-chip-label" class="goal-chip-label">15×2</span>
             </button>
             <button
               id="btn-commit"
@@ -1621,6 +1957,7 @@
             <div class="stat">
               <p class="stat-k">Goal</p>
               <p class="stat-v" id="stat-goal">—</p>
+              <p class="stat-sub" id="stat-target-reps">15 × 2</p>
             </div>
             <div class="stat">
               <p class="stat-k">BMI</p>
@@ -1632,6 +1969,12 @@
             <p class="week-title">7-DAY FORCE MAP</p>
             <div id="week-days" class="week-days"></div>
           </section>
+
+          <nav
+            id="bottom-achieve-nav"
+            class="bottom-achieve-nav"
+            aria-label="Achievements"
+          ></nav>
         </main>
       </section>
     </div>
@@ -1782,6 +2125,98 @@
       </div>
     </div>
 
+    <div id="modal-achieve" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="achieve"></div>
+      <div class="modal-card achieve-card">
+        <button class="modal-x" data-close="achieve" type="button">×</button>
+        <p class="report-eyebrow">ACHIEVEMENTS</p>
+        <h2>Achievement Vault</h2>
+        <p class="muted" id="achieve-sub">
+          Badge terbuka otomatis dari commit harianmu.
+        </p>
+        <div class="achieve-progress">
+          <div class="fill" id="achieve-bar"></div>
+        </div>
+        <div id="badge-rail" class="badge-rail"></div>
+        <button
+          id="btn-achieve-close"
+          class="btn btn-primary btn-block"
+          type="button"
+          style="margin-top: 18px"
+        >
+          i'm locked in
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-goal" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="goal"></div>
+      <div class="modal-card goal-card">
+        <button class="modal-x" data-close="goal" type="button">×</button>
+        <p class="report-eyebrow">GOAL REPS</p>
+        <h2>Atur Target Harian</h2>
+        <p class="muted">
+          Target dipakai untuk sisi kiri &amp; kanan. Default 15 kiri / 15
+          kanan.
+        </p>
+        <div class="goal-value-row">
+          <button
+            id="goal-dec"
+            class="goal-step"
+            type="button"
+            aria-label="Kurangi goal"
+          >
+            −
+          </button>
+          <input
+            id="goal-input"
+            class="goal-input"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="500"
+            step="1"
+            value="15"
+            aria-label="Goal reps"
+          />
+          <button
+            id="goal-inc"
+            class="goal-step"
+            type="button"
+            aria-label="Tambah goal"
+          >
+            +
+          </button>
+        </div>
+        <div id="goal-presets" class="goal-presets">
+          <button class="goal-preset" type="button" data-goal="5">5</button>
+          <button class="goal-preset" type="button" data-goal="10">10</button>
+          <button class="goal-preset" type="button" data-goal="12">12</button>
+          <button class="goal-preset active" type="button" data-goal="15">
+            15
+          </button>
+          <button class="goal-preset" type="button" data-goal="20">20</button>
+          <button class="goal-preset" type="button" data-goal="30">30</button>
+        </div>
+        <p class="goal-hint" id="goal-hint">KIRI 15 · KANAN 15</p>
+        <button
+          id="btn-goal-save"
+          class="btn btn-brutal btn-block"
+          type="button"
+        >
+          SIMPAN GOAL
+        </button>
+        <button
+          id="btn-goal-default"
+          class="btn btn-ghost btn-block"
+          type="button"
+          style="margin-top: 10px"
+        >
+          Balik ke default 15×2
+        </button>
+      </div>
+    </div>
+
     <div id="modal-badge" class="modal" aria-hidden="true">
       <div class="modal-backdrop" data-close="badge"></div>
       <div class="modal-card center-text">
@@ -1809,8 +2244,10 @@
           SUPABASE_URL: "https://cnghoruhqqrqkeogprbz.supabase.co",
           SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuZ2hvcnVocXFycWtlb2dwcmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4Mzk3MDUsImV4cCI6MjEwNTQxNTcwNX0.KlcGL7G34AnDVb8Ju6HRLpbt4JCj9QVLYfSTIqwJt6Q",
           MIN_REPS: 15,
+          DEFAULT_GOAL_REPS: 15,
           STREAK_TZ: "Asia/Jakarta",
           STORAGE_KEY: "forge_v1_state",
+          ACCOUNTS_KEY: "forge_v1_accounts",
         };
 
         function isConfigured() {
@@ -1858,7 +2295,68 @@
         }
 
         function writeLocal(state) {
-          localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(state));
+          try {
+            localStorage.setItem(APP_CONFIG.STORAGE_KEY, JSON.stringify(state));
+          } catch (e) {}
+          try {
+            if (state && state.user) {
+              var reg = readAccounts();
+              stashAccount(reg, state.user, state);
+              writeAccounts(reg);
+            }
+          } catch (e) {}
+        }
+
+        function readAccounts() {
+          try {
+            var raw = localStorage.getItem(APP_CONFIG.ACCOUNTS_KEY);
+            var reg = raw ? JSON.parse(raw) : null;
+            if (!reg || typeof reg !== "object") reg = {};
+            if (!reg.accounts || typeof reg.accounts !== "object")
+              reg.accounts = {};
+            if (!reg.activeId) reg.activeId = null;
+            return reg;
+          } catch (e) {
+            return { activeId: null, accounts: {} };
+          }
+        }
+
+        function writeAccounts(reg) {
+          try {
+            localStorage.setItem(APP_CONFIG.ACCOUNTS_KEY, JSON.stringify(reg));
+          } catch (e) {}
+        }
+
+        function accountKey(user) {
+          if (!user) return null;
+          if (user.email) return String(user.email).toLowerCase();
+          if (user.id) return String(user.id);
+          return null;
+        }
+
+        function stashAccount(reg, user, snapshot) {
+          var key = accountKey(user);
+          if (!key) return null;
+          var prev = reg.accounts[key] || {};
+          var snap = snapshot || prev.snapshot || null;
+          var profile = (snap && snap.profile) || null;
+          reg.accounts[key] = {
+            key: key,
+            id: user.id || prev.id || null,
+            email: user.email || prev.email || null,
+            name:
+              (profile && profile.name) || user.name || prev.name || "Athlete",
+            avatar:
+              (profile && profile.avatar_url) ||
+              user.avatar ||
+              prev.avatar ||
+              null,
+            provider: user.provider || prev.provider || "google",
+            lastUsed: Date.now(),
+            snapshot: snap,
+          };
+          reg.activeId = key;
+          return key;
         }
 
         function defaultState() {
@@ -1876,6 +2374,7 @@
             seenAchievements: {},
             monthlyReportsSeen: {},
             createdAt: null,
+            goalReps: APP_CONFIG.DEFAULT_GOAL_REPS || 15,
           };
         }
 
@@ -1911,14 +2410,19 @@
             if (res.error) throw res.error;
             return res.data.session;
           },
-          signInWithGoogle: async function () {
+          signInWithGoogle: async function (loginHint) {
             if (!client) throw new Error("Supabase belum dikonfigurasi.");
             var redirectTo = window.location.origin + window.location.pathname;
+            var params = { access_type: "offline", prompt: "consent" };
+            if (loginHint) {
+              params.login_hint = loginHint;
+              params.prompt = "select_account";
+            }
             var res = await client.auth.signInWithOAuth({
               provider: "google",
               options: {
                 redirectTo: redirectTo,
-                queryParams: { access_type: "offline", prompt: "consent" },
+                queryParams: params,
               },
             });
             if (res.error) throw res.error;
@@ -1939,6 +2443,30 @@
             };
             writeLocal(state);
             return state.user;
+          },
+          signInLocal: async function () {
+            if (hasCloud)
+              throw new Error(
+                "Akun lokal tidak tersedia saat Supabase sudah terhubung.",
+              );
+            var reg = readAccounts();
+            if (state.user) stashAccount(reg, state.user, liveSnapshot());
+            var seq = Object.keys(reg.accounts).length + 1;
+            var user = {
+              id: "local-" + Date.now().toString(36) + "-" + seq,
+              email: null,
+              name: "Athlete " + seq,
+              avatar: null,
+              provider: "local",
+            };
+            var fresh = defaultState();
+            fresh.user = user;
+            fresh.goalReps = APP_CONFIG.DEFAULT_GOAL_REPS || 15;
+            writeLocal(fresh);
+            reg = readAccounts();
+            reg.activeId = accountKey(user);
+            writeAccounts(reg);
+            return user;
           },
           signOut: async function () {
             if (client) await client.auth.signOut();
@@ -2139,6 +2667,67 @@
               .single();
             if (res.error) throw res.error;
             return meta;
+          },
+          listAccounts: function () {
+            return readAccounts();
+          },
+          saveActiveAccount: function () {
+            if (!state.user) return null;
+            var reg = readAccounts();
+            var key = stashAccount(reg, state.user, liveSnapshot());
+            writeAccounts(reg);
+            return key;
+          },
+          removeAccount: function (key) {
+            var reg = readAccounts();
+            if (!reg.accounts[key]) return;
+            delete reg.accounts[key];
+            if (reg.activeId === key) reg.activeId = null;
+            writeAccounts(reg);
+          },
+          switchAccount: async function (key) {
+            var reg = readAccounts();
+            var acc = reg.accounts[key];
+            if (!acc) throw new Error("Akun tidak ditemukan.");
+            if (
+              hasCloud &&
+              acc.provider === "google" &&
+              (!state.user || state.user.id !== acc.id)
+            )
+              throw new Error(
+                "Akun Google perlu login ulang lewat tombol Google.",
+              );
+            if (state.user && accountKey(state.user) !== key)
+              stashAccount(reg, state.user, liveSnapshot());
+            var snap = acc.snapshot
+              ? JSON.parse(JSON.stringify(acc.snapshot))
+              : defaultState();
+            var prevUser = snap.user || {};
+            var profile = snap.profile || null;
+            var user = Object.assign({}, prevUser, {
+              id: prevUser.id || acc.id || key,
+              email: prevUser.email || acc.email || null,
+              name:
+                (profile && profile.name) ||
+                prevUser.name ||
+                acc.name ||
+                "Athlete",
+              avatar:
+                (profile && profile.avatar_url) ||
+                prevUser.avatar ||
+                acc.avatar ||
+                null,
+              provider: prevUser.provider || acc.provider || "google",
+            });
+            snap.user = user;
+            if (!snap.goalReps)
+              snap.goalReps = APP_CONFIG.DEFAULT_GOAL_REPS || 15;
+            writeLocal(snap);
+            reg = readAccounts();
+            reg.activeId = key;
+            writeAccounts(reg);
+            state.user = user;
+            return user;
           },
         };
 
@@ -2750,7 +3339,7 @@
           {
             id: "bilateral",
             name: "Bilateral",
-            desc: "Selesaikan 15 kiri & 15 kanan dalam satu sesi.",
+            desc: "Selesaikan target penuh kiri & kanan dalam satu sesi.",
             check: function (c) {
               return c.bilateralSessions >= 1;
             },
@@ -2941,11 +3530,14 @@
           var hist = pr.history || {};
           var commits = 0;
           var bilateral = 0;
+          var target = Number(appState && appState.goalReps) || MIN || 15;
+          if (!isFinite(target) || target < 1) target = MIN || 15;
           Object.keys(hist).forEach(function (k) {
             var e = hist[k];
             if (e && e.committed) {
               commits += 1;
-              if ((e.left || 0) >= 15 && (e.right || 0) >= 15) bilateral += 1;
+              if ((e.left || 0) >= target && (e.right || 0) >= target)
+                bilateral += 1;
             }
           });
           var created =
@@ -3034,6 +3626,110 @@
         }
 
         var MIN = APP_CONFIG.MIN_REPS || 15;
+        var MAX_GOAL_REPS = 500;
+
+        function normalizeGoal(n) {
+          var v = Math.round(Number(n));
+          if (!isFinite(v) || v < 1) v = MIN;
+          return Math.max(1, Math.min(MAX_GOAL_REPS, v));
+        }
+
+        function goalReps() {
+          return normalizeGoal(
+            state ? state.goalReps : APP_CONFIG.DEFAULT_GOAL_REPS || MIN,
+          );
+        }
+
+        function liveSnapshot() {
+          var snap = readLocal() || defaultState();
+          if (!state.user) return snap;
+          snap.user = Object.assign({}, state.user);
+          if (state.profile) snap.profile = state.profile;
+          var pr = state.progress || {};
+          snap.streak = pr.streak || 0;
+          snap.bestStreak = pr.bestStreak || 0;
+          snap.lastCommitDate = pr.lastCommitDate || null;
+          snap.lifetimeReps = pr.lifetimeReps || 0;
+          snap.history = pr.history || {};
+          snap.achievements = state.achievements || {};
+          snap.seenAchievements = state.seenAchievements || {};
+          snap.monthlyReportsSeen = state.monthlyReportsSeen || {};
+          snap.createdAt = state.metaCreatedAt || snap.createdAt || null;
+          snap.goalReps = goalReps();
+          snap.earlyCommits = state.earlyCommits || 0;
+          snap.lateCommits = state.lateCommits || 0;
+          snap.bilateralSessions = state.bilateralSessions || 0;
+          return snap;
+        }
+
+        function updateGoalUI() {
+          var g = goalReps();
+          var lt = $("#rep-target-left");
+          var rt = $("#rep-target-right");
+          if (lt) lt.textContent = "/ " + g;
+          if (rt) rt.textContent = "/ " + g;
+          var mandate = $("#mandate-text");
+          if (mandate)
+            mandate.innerHTML =
+              "MINIMUM HARI INI: <strong>" +
+              g +
+              " KIRI</strong> · <strong>" +
+              g +
+              " KANAN</strong>";
+          var chip = $("#goal-chip-label");
+          if (chip) chip.textContent = g + "×2";
+          var stat = $("#stat-target-reps");
+          if (stat) stat.textContent = g + " × 2";
+          var hint = $("#goal-hint");
+          if (hint) hint.textContent = "KIRI " + g + " · KANAN " + g;
+          var input = $("#goal-input");
+          if (input && document.activeElement !== input)
+            input.value = String(g);
+          $$("#goal-presets .goal-preset").forEach(function (b) {
+            b.classList.toggle(
+              "active",
+              Number(b.getAttribute("data-goal")) === g,
+            );
+          });
+        }
+
+        function updateGoalDraftUI(n) {
+          var g = normalizeGoal(n);
+          var hint = $("#goal-hint");
+          if (hint) hint.textContent = "KIRI " + g + " · KANAN " + g;
+          $$("#goal-presets .goal-preset").forEach(function (b) {
+            b.classList.toggle(
+              "active",
+              Number(b.getAttribute("data-goal")) === g,
+            );
+          });
+        }
+
+        function setGoalDraft(n) {
+          var g = normalizeGoal(n);
+          var input = $("#goal-input");
+          if (input) input.value = String(g);
+          updateGoalDraftUI(g);
+        }
+
+        function openGoalModal() {
+          setGoalDraft(goalReps());
+          openModal("modal-goal");
+        }
+
+        function applyGoalReps(n, silent) {
+          var val = normalizeGoal(n);
+          state.goalReps = val;
+          var local = readLocal() || defaultState();
+          local.goalReps = val;
+          writeLocal(local);
+          updateGoalUI();
+          updateRepUI();
+          syncAchievements();
+          if (!silent) toast("Goal: " + val + " kiri · " + val + " kanan");
+          return val;
+        }
+
         function $(sel) {
           return document.querySelector(sel);
         }
@@ -3062,6 +3758,7 @@
           lateCommits: 0,
           bilateralSessions: 0,
           pfpDraft: null,
+          goalReps: APP_CONFIG.DEFAULT_GOAL_REPS || 15,
         };
 
         var tracker = null;
@@ -3082,6 +3779,7 @@
           $$(".view").forEach(function (v) {
             v.classList.toggle("active", v.id === id);
           });
+          if (id === "view-login") renderLoginAccounts();
         }
 
         function bmi(weight, heightCm) {
@@ -3102,17 +3800,19 @@
         }
 
         function updateRepUI() {
+          var target = goalReps();
           $("#rep-left").textContent = String(state.reps.left);
           $("#rep-right").textContent = String(state.reps.right);
           $("#bar-left").style.width =
-            Math.min(100, (state.reps.left / MIN) * 100) + "%";
+            Math.min(100, (state.reps.left / target) * 100) + "%";
           $("#bar-right").style.width =
-            Math.min(100, (state.reps.right / MIN) * 100) + "%";
+            Math.min(100, (state.reps.right / target) * 100) + "%";
           var done =
-            state.reps.left >= MIN &&
-            state.reps.right >= MIN &&
+            state.reps.left >= target &&
+            state.reps.right >= target &&
             !state.progress.committedToday;
           $("#btn-commit").disabled = !done || state.committing;
+          updateGoalUI();
         }
 
         function initials(name) {
@@ -3158,6 +3858,26 @@
           var count = Object.keys(unlocked).length;
           var countEl = $("#achieve-count");
           if (countEl) countEl.textContent = count + "/" + BADGES.length;
+          var hasNew = false;
+          BADGES.forEach(function (b) {
+            if (unlocked[b.id] && !seen[b.id]) hasNew = true;
+          });
+          var bar = $("#achieve-bar");
+          if (bar)
+            bar.style.width =
+              (BADGES.length ? Math.round((count / BADGES.length) * 100) : 0) +
+              "%";
+          var sub = $("#achieve-sub");
+          if (sub)
+            sub.textContent =
+              count +
+              " dari " +
+              BADGES.length +
+              " badge terbuka" +
+              (hasNew ? " · ada badge baru buatmu" : "") +
+              ".";
+          var chip = $("#btn-achievements");
+          if (chip) chip.classList.toggle("has-new", hasNew);
           var rail = $("#badge-rail");
           var nav = $("#bottom-achieve-nav");
           if (rail) rail.innerHTML = "";
@@ -3331,6 +4051,7 @@
             cell.title = d.key;
             root.appendChild(cell);
           });
+          updateGoalUI();
           syncAchievements();
         }
 
@@ -3428,6 +4149,9 @@
             state.earlyCommits = local.earlyCommits || 0;
             state.lateCommits = local.lateCommits || 0;
             state.bilateralSessions = local.bilateralSessions || 0;
+            state.goalReps = normalizeGoal(
+              local.goalReps || APP_CONFIG.DEFAULT_GOAL_REPS || MIN,
+            );
           } catch (e) {}
           if (!profile || !profile.name || !profile.goal) {
             showView("view-onboard");
@@ -3497,6 +4221,7 @@
             toast("Auth error: " + e.message);
           }
           await enterApp();
+          renderLoginAccounts();
         }
 
         function bindOnboard() {
@@ -3551,6 +4276,191 @@
           });
         }
 
+        function detachCameraSession() {
+          if (tracker) tracker.stop();
+          state.camOn = false;
+          state.reps = { left: 0, right: 0 };
+          var ph = $("#cam-placeholder");
+          if (ph) ph.classList.remove("hidden");
+          var hud = $("#hud-status");
+          if (hud) {
+            hud.textContent = "STANDBY";
+            hud.classList.remove("live");
+          }
+          updateRepUI();
+        }
+
+        function closestData(el, attr) {
+          var node = el;
+          while (node && node !== document) {
+            if (
+              node.nodeType === 1 &&
+              node.getAttribute &&
+              node.getAttribute(attr) != null
+            )
+              return node.getAttribute(attr);
+            node = node.parentNode;
+          }
+          return null;
+        }
+
+        function escapeHtml(s) {
+          return String(s == null ? "" : s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+        }
+
+        function accountInitials(acc) {
+          var nm = acc.name || acc.email || "F";
+          var parts = String(nm).trim().split(/\s+/);
+          var s = parts[0].charAt(0);
+          if (parts.length > 1) s += parts[1].charAt(0);
+          return s.toUpperCase();
+        }
+
+        function accountAvatarHtml(acc) {
+          if (acc.avatar)
+            return '<img alt="" src="' + escapeHtml(acc.avatar) + '" />';
+          return (
+            '<span class="account-ini">' + accountInitials(acc) + "</span>"
+          );
+        }
+
+        function accountSubLabel(acc) {
+          if (acc.email) return acc.email;
+          if (acc.provider === "demo") return "Demo mode";
+          if (acc.provider === "local") return "Akun lokal";
+          return "Akun tersimpan";
+        }
+
+        function renderLoginAccounts() {
+          var wrap = $("#login-accounts-wrap");
+          var list = $("#login-accounts");
+          if (!wrap || !list) return;
+          var reg = readAccounts();
+          var keys = Object.keys(reg.accounts).filter(function (k) {
+            return !!reg.accounts[k];
+          });
+          keys.sort(function (a, b) {
+            return (
+              (reg.accounts[b].lastUsed || 0) - (reg.accounts[a].lastUsed || 0)
+            );
+          });
+          list.innerHTML = "";
+          if (!keys.length) {
+            wrap.hidden = true;
+            return;
+          }
+          wrap.hidden = false;
+          keys.forEach(function (key) {
+            var acc = reg.accounts[key];
+            var sub = accountSubLabel(acc);
+            var row = document.createElement("div");
+            row.className =
+              "account-row" + (key === reg.activeId ? " active" : "");
+            var pick = document.createElement("button");
+            pick.type = "button";
+            pick.className = "account-pick";
+            pick.setAttribute("data-account", key);
+            pick.innerHTML =
+              '<span class="account-av">' +
+              accountAvatarHtml(acc) +
+              "</span>" +
+              '<span class="account-meta">' +
+              '<span class="account-name">' +
+              escapeHtml(acc.name || sub) +
+              "</span>" +
+              '<span class="account-sub">' +
+              escapeHtml(sub) +
+              "</span></span>" +
+              (key === reg.activeId
+                ? '<span class="account-tag">TERAKHIR</span>'
+                : "");
+            var del = document.createElement("button");
+            del.type = "button";
+            del.className = "account-del";
+            del.setAttribute("data-account-del", key);
+            del.setAttribute("aria-label", "Hapus dari daftar");
+            del.textContent = "×";
+            row.appendChild(pick);
+            row.appendChild(del);
+            list.appendChild(row);
+          });
+        }
+
+        async function pickSavedAccount(key) {
+          var reg = readAccounts();
+          var acc = reg.accounts[key];
+          if (!acc) return;
+          if (
+            ForgeDB.hasCloud &&
+            acc.provider === "google" &&
+            !(state.user && state.user.id === acc.id)
+          ) {
+            toast("Buka Google untuk " + (acc.email || "akun ini"));
+            try {
+              await ForgeDB.signInWithGoogle(acc.email || null);
+            } catch (e) {
+              toast(e.message || "Google sign-in gagal");
+            }
+            return;
+          }
+          try {
+            detachCameraSession();
+            var user = await ForgeDB.switchAccount(key);
+            toast("Beralih ke " + (user.name || user.email || "akun"));
+            await enterApp();
+          } catch (e) {
+            toast(e.message || "Gagal ganti akun");
+          }
+        }
+
+        function bindAccounts() {
+          var list = $("#login-accounts");
+          if (list)
+            list.addEventListener("click", function (e) {
+              var delKey = closestData(e.target, "data-account-del");
+              var pickKey = closestData(e.target, "data-account");
+              if (delKey) {
+                var isCurrent = accountKey(state.user) === delKey;
+                ForgeDB.removeAccount(delKey);
+                toast("Akun dihapus dari daftar");
+                if (isCurrent) {
+                  ForgeDB.signOut().then(function () {
+                    state.user = null;
+                    state.profile = null;
+                    showView("view-login");
+                    renderLoginAccounts();
+                  });
+                } else {
+                  renderLoginAccounts();
+                }
+                return;
+              }
+              if (pickKey) pickSavedAccount(pickKey);
+            });
+
+          var add = $("#btn-account-add");
+          if (add)
+            add.addEventListener("click", async function () {
+              try {
+                if (ForgeDB.hasCloud) {
+                  ForgeDB.saveActiveAccount();
+                  await ForgeDB.signInWithGoogle(null);
+                  return;
+                }
+                detachCameraSession();
+                state.user = await ForgeDB.signInLocal();
+                toast("Akun lokal baru dibuat");
+                await enterApp();
+              } catch (e) {
+                toast(e.message || "Gagal tambah akun");
+              }
+            });
+        }
+
         function bindAuth() {
           $("#btn-google").addEventListener("click", async function () {
             try {
@@ -3582,14 +4492,14 @@
           });
 
           $("#btn-logout").addEventListener("click", async function () {
-            if (tracker) tracker.stop();
-            state.camOn = false;
-            $("#cam-placeholder").classList.remove("hidden");
+            ForgeDB.saveActiveAccount();
+            detachCameraSession();
             await ForgeDB.signOut();
             state.user = null;
             state.profile = null;
             state.reps = { left: 0, right: 0 };
             showView("view-login");
+            renderLoginAccounts();
             applyDemoVisibility();
             toast("Logged out");
           });
@@ -3643,7 +4553,8 @@
           });
 
           $("#btn-commit").addEventListener("click", async function () {
-            if (state.reps.left < MIN || state.reps.right < MIN) return;
+            var target = goalReps();
+            if (state.reps.left < target || state.reps.right < target) return;
             if (state.progress.committedToday) {
               toast("Sudah commit hari ini");
               return;
@@ -3657,7 +4568,7 @@
                 state.reps.right,
               );
               state.progress = next;
-              if (state.reps.left >= MIN && state.reps.right >= MIN) {
+              if (state.reps.left >= target && state.reps.right >= target) {
                 state.bilateralSessions = (state.bilateralSessions || 0) + 1;
               }
               var hour = wibHourNow();
@@ -3692,6 +4603,71 @@
             openModal("modal-streak");
           });
 
+          var achieveBtn = $("#btn-achievements");
+          if (achieveBtn)
+            achieveBtn.addEventListener("click", function () {
+              renderAchievements();
+              openModal("modal-achieve");
+            });
+
+          var achieveClose = $("#btn-achieve-close");
+          if (achieveClose)
+            achieveClose.addEventListener("click", function () {
+              closeModal("modal-achieve");
+            });
+
+          var goalOpen = $("#btn-goal");
+          if (goalOpen)
+            goalOpen.addEventListener("click", function () {
+              openGoalModal();
+            });
+
+          var goalDec = $("#goal-dec");
+          if (goalDec)
+            goalDec.addEventListener("click", function () {
+              setGoalDraft(normalizeGoal(Number($("#goal-input").value) - 1));
+            });
+
+          var goalInc = $("#goal-inc");
+          if (goalInc)
+            goalInc.addEventListener("click", function () {
+              setGoalDraft(normalizeGoal(Number($("#goal-input").value) + 1));
+            });
+
+          var goalInput = $("#goal-input");
+          if (goalInput) {
+            goalInput.addEventListener("input", function () {
+              var clean = goalInput.value.replace(/[^0-9]/g, "");
+              if (clean !== goalInput.value) goalInput.value = clean;
+              if (clean !== "") updateGoalDraftUI(normalizeGoal(Number(clean)));
+            });
+            goalInput.addEventListener("blur", function () {
+              setGoalDraft(goalInput.value);
+            });
+          }
+
+          var goalPresets = $("#goal-presets");
+          if (goalPresets)
+            goalPresets.addEventListener("click", function (e) {
+              var val = closestData(e.target, "data-goal");
+              if (val == null) return;
+              setGoalDraft(normalizeGoal(val));
+            });
+
+          var goalSave = $("#btn-goal-save");
+          if (goalSave)
+            goalSave.addEventListener("click", function () {
+              applyGoalReps(normalizeGoal($("#goal-input").value));
+              closeModal("modal-goal");
+            });
+
+          var goalDefault = $("#btn-goal-default");
+          if (goalDefault)
+            goalDefault.addEventListener("click", function () {
+              applyGoalReps(APP_CONFIG.DEFAULT_GOAL_REPS || 15);
+              closeModal("modal-goal");
+            });
+
           $$("[data-close='streak']").forEach(function (el) {
             el.addEventListener("click", function () {
               closeModal("modal-streak");
@@ -3708,6 +4684,8 @@
           closeByAttr("pfp");
           closeByAttr("report");
           closeByAttr("badge");
+          closeByAttr("achieve");
+          closeByAttr("goal");
 
           var reportClose = $("#btn-report-close");
           if (reportClose)
@@ -3826,6 +4804,7 @@
         bindAuth();
         bindOnboard();
         bindWorkout();
+        bindAccounts();
         bootstrap();
       })();
     </script>
@@ -3838,6 +4817,42 @@
             var d = b.createElement("script");
             d.innerHTML =
               "window.__CF$cv$params={r:'a3de7ebfff45c3c2',t:'MTc4OTg4MjgyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b =
+            a.contentDocument || (a.contentWindow && a.contentWindow.document);
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'a3e58854ce3bfe1f',t:'MTc4OTk1NjYxNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
